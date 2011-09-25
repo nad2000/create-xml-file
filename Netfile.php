@@ -34,8 +34,8 @@ $ReturnLines = array(
 			<comm:SoftwareRevisionDate><?=$SoftwareRevisionDate?></comm:SoftwareRevisionDate>
 			<t1:TaxpayerData>
 				<tp:TaxpayerBasicData>
-					<tp:TaxpayerSocialInsuranceNumber><?=TaxpayerSocialInsuranceNumber;?></tp:TaxpayerSocialInsuranceNumber>
-					<tp:TaxYear><?=TaxYear?></tp:TaxYear>
+					<tp:TaxpayerSocialInsuranceNumber><?=$TaxpayerSocialInsuranceNumber;?></tp:TaxpayerSocialInsuranceNumber>
+					<tp:TaxYear><?=$TaxYear?></tp:TaxYear>
 					<tp:TaxpayerBirthDate>1966-07-12</tp:TaxpayerBirthDate>
 					<tp:TaxpayerMaritalStatusCode>6</tp:TaxpayerMaritalStatusCode>
 					<tp:SelfEmployedSpouseDeadlineIndicator>0</tp:SelfEmployedSpouseDeadlineIndicator>
@@ -46,8 +46,8 @@ $ReturnLines = array(
 				</tp:TaxpayerResidenceData>
 				<tp:TaxpayerContactData>
 					<comm:TaxpayerName>
-						<comm:GivenName><?=GivenName;?></comm:GivenName>
-						<comm:FamilyName><?=FamilyName;?></comm:FamilyName>
+						<comm:GivenName><?=$GivenName;?></comm:GivenName>
+						<comm:FamilyName><?=$FamilyName;?></comm:FamilyName>
 					</comm:TaxpayerName>
 					<tp:TaxpayerMailingAddress>
 						<comm:CanadianMailingAddress>
