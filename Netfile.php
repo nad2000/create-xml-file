@@ -1,18 +1,23 @@
 <?php
+// to run from CLI: php -f Netfile.php | more
 echo '<?xml version="1.0"?>';
 $SoftwareID='061G';
 $SoftwareRevisionDate='2011-08-06';
 
 // Tax reuturns data - should be supplied from DB
-$data = array(
-	// ReturnLines
-	'lines' => array(
-		array( 'code'=>260, 'value'=>12725),
-		array( 'code'=>300, 'value'=>10382),
-		array( 'code'=>308, 'value'=>29700)
-	)
+// Taxpayer data:
+$TaxpayerSocialInsuranceNumber = '111111118';
+$TaxYear = 2011;
+//...
+$GivenName = 'John';
+$FamilyName = 'Doe';
+
+// ReturnLines
+$ReturnLines = array(
+	array( 'code'=>260, 'value'=>12725),
+	array( 'code'=>300, 'value'=>10382),
+	array( 'code'=>308, 'value'=>29700)
 );
-//print_r($data);
 ?>
 <net:Netfile 
 	xmlns:comm="http://www.cra-arc.gc.ca/xmlns/comm/2012/1-0-0" 
@@ -29,8 +34,8 @@ $data = array(
 			<comm:SoftwareRevisionDate><?=$SoftwareRevisionDate?></comm:SoftwareRevisionDate>
 			<t1:TaxpayerData>
 				<tp:TaxpayerBasicData>
-					<tp:TaxpayerSocialInsuranceNumber>111111118</tp:TaxpayerSocialInsuranceNumber>
-					<tp:TaxYear>2011</tp:TaxYear>
+					<tp:TaxpayerSocialInsuranceNumber><?=TaxpayerSocialInsuranceNumber;?></tp:TaxpayerSocialInsuranceNumber>
+					<tp:TaxYear><?=TaxYear?></tp:TaxYear>
 					<tp:TaxpayerBirthDate>1966-07-12</tp:TaxpayerBirthDate>
 					<tp:TaxpayerMaritalStatusCode>6</tp:TaxpayerMaritalStatusCode>
 					<tp:SelfEmployedSpouseDeadlineIndicator>0</tp:SelfEmployedSpouseDeadlineIndicator>
@@ -41,8 +46,8 @@ $data = array(
 				</tp:TaxpayerResidenceData>
 				<tp:TaxpayerContactData>
 					<comm:TaxpayerName>
-						<comm:GivenName></comm:GivenName>
-						<comm:FamilyName></comm:FamilyName>
+						<comm:GivenName><?=GivenName;?></comm:GivenName>
+						<comm:FamilyName><?=FamilyName;?></comm:FamilyName>
 					</comm:TaxpayerName>
 					<tp:TaxpayerMailingAddress>
 						<comm:CanadianMailingAddress>
@@ -65,10 +70,10 @@ $data = array(
 				<t1:ElectionsCanadaAuthorizationIndicator>02</t1:ElectionsCanadaAuthorizationIndicator>
 				<t1:GSTHSTCreditApplicationIndicator>1</t1:GSTHSTCreditApplicationIndicator>
 			</t1:RelatedProgramData>
-			<?php foreach ($data['lines'] as $field): ?>
+			<?php foreach ($ReturnLines as $line): ?>
 			<comm:ReturnLine>
-				<comm:FieldCode><?=$field->code?></comm:FieldCode>
-				<comm:FieldValue><?=$field['value']?></comm:FieldValue>
+				<comm:FieldCode><?=$line['code']?></comm:FieldCode>
+				<comm:FieldValue><?=$line['value']?></comm:FieldValue>
 			</comm:ReturnLine>
 			<?php endforeach;?>
 			<t1:SelectedFinancialDataRecordCount>06</t1:SelectedFinancialDataRecordCount>
