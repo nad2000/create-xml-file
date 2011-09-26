@@ -76,7 +76,7 @@ foreach( $data as $row ) {
 	if (	$row->line_type == 'TRC_L' 
 			&& $row->field_code >= 100
 			&& $row->field_code <= 8000)
-		$returnLines[] = array( 'code'=>$row->field_code, 'value'=>$row->line_value);
+		$returnLines[] = (object) array( 'code'=>$row->field_code, 'value'=>$row->line_value);
 }
 
 ?>
@@ -133,8 +133,8 @@ foreach( $data as $row ) {
 			</t1:RelatedProgramData>
 <?php foreach ($returnLines as $line): ?>
 			<comm:ReturnLine>
-				<comm:FieldCode><?=$line['code']?></comm:FieldCode>
-				<comm:FieldValue><?=$line['value']?></comm:FieldValue>
+				<comm:FieldCode><?=$line->code ?></comm:FieldCode>
+				<comm:FieldValue><?=$line->value ?></comm:FieldValue>
 			</comm:ReturnLine>
 <?php endforeach;?>
 		</t1:T1Return>
