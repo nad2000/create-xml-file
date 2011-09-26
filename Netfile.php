@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Data access component
+ */
 class DataSource {
 
 	static private $_user = 'root';
@@ -66,7 +69,6 @@ $familyName = 'Doe';
 
 $data = DataSource::getData( $userYd = 2, $taxYear = $taxYear);
 
-
 // ReturnLines
 $returnLines = array();
 
@@ -76,8 +78,6 @@ foreach( $data as $row ) {
 			&& $row->field_code <= 8000)
 		$returnLines[] = array( 'code'=>$row->field_code, 'value'=>$row->line_value);
 }
-print_r( $returnLines);
-
 
 ?>
 <net:Netfile 
@@ -131,12 +131,12 @@ print_r( $returnLines);
 				<t1:ElectionsCanadaAuthorizationIndicator>02</t1:ElectionsCanadaAuthorizationIndicator>
 				<t1:GSTHSTCreditApplicationIndicator>1</t1:GSTHSTCreditApplicationIndicator>
 			</t1:RelatedProgramData>
-			<?php foreach ($returnLines as $line): ?>
+<?php foreach ($returnLines as $line): ?>
 			<comm:ReturnLine>
 				<comm:FieldCode><?=$line['code']?></comm:FieldCode>
 				<comm:FieldValue><?=$line['value']?></comm:FieldValue>
 			</comm:ReturnLine>
-			<?php endforeach;?>
+<?php endforeach;?>
 		</t1:T1Return>
 	</net:T1Netfile>
 </net:Netfile>
