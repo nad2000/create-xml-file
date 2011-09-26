@@ -1,4 +1,56 @@
 <?php
+
+class DataSource {
+
+	static private $_user = 'root';
+	static private $_pass = NULL;
+	static private $_connectionString = 'mysql:host=localhost;dbname=test';
+
+	/**
+	 *
+	 * @return type 
+	 */
+	function __construct() {
+		return;
+	}
+	
+	/**
+	 *
+	 * @param int $userId User ID
+	 * @param int $taxYear Tax Year
+	 * @return array() 
+	 */
+	static function getData(
+			$userId = 2,
+			$taxYear = 2010) {
+
+		try {
+			$dbh = new PDO( 
+					static::$_connectionString, 
+					static::$_user, 
+					static::$_pass );
+			$stmt = $dbh->prepare(
+					"SELECT
+						r.*,
+						SUBSTRING_INDEX(line_id,'_',2) AS line_type, -- Line ID prefix
+						SUBSTRING_INDEX(line_id,'_',-1) AS field_code -- Field code
+					FROM result_data AS r
+					WHERE user_id = ? AND tax_year = ?");
+			$stmt->execute( array( $userId, $taxYear ));
+			$rows = $stmt->fetchAll(PDO::FETCH_CLASS);
+			$dbh = null;
+		} catch (PDOException $e) {
+			print "Error!: " . $e->getMessage() . "<br/>";
+			die();
+		}
+
+		return $rows;
+	}
+
+}
+
+// TODO: Encapsulate into a class
+
 // to run from CLI: php -f Netfile.php | more
 echo '<?xml version="1.0"?>';
 $SoftwareID='061G';
@@ -6,18 +58,27 @@ $SoftwareRevisionDate='2011-08-06';
 
 // Tax reuturns data - should be supplied from DB
 // Taxpayer data:
-$TaxpayerSocialInsuranceNumber = '111111118';
-$TaxYear = 2011;
+$taxpayerSocialInsuranceNumber = '111111118';
+$taxYear = 2010;
 //...
-$GivenName = 'John';
-$FamilyName = 'Doe';
+$givenName = 'John';
+$familyName = 'Doe';
+
+$data = DataSource::getData( $userYd = 2, $taxYear = $taxYear);
+
 
 // ReturnLines
-$ReturnLines = array(
-	array( 'code'=>260, 'value'=>12725),
-	array( 'code'=>300, 'value'=>10382),
-	array( 'code'=>308, 'value'=>29700)
-);
+$returnLines = array();
+
+foreach( $data as $row ) {
+	if (	$row->line_type == 'TRC_L' 
+			&& $row->field_code >= 100
+			&& $row->field_code <= 8000)
+		$returnLines[] = array( 'code'=>$row->field_code, 'value'=>$row->line_value);
+}
+print_r( $returnLines);
+
+
 ?>
 <net:Netfile 
 	xmlns:comm="http://www.cra-arc.gc.ca/xmlns/comm/2012/1-0-0" 
@@ -34,8 +95,8 @@ $ReturnLines = array(
 			<comm:SoftwareRevisionDate><?=$SoftwareRevisionDate?></comm:SoftwareRevisionDate>
 			<t1:TaxpayerData>
 				<tp:TaxpayerBasicData>
-					<tp:TaxpayerSocialInsuranceNumber><?=$TaxpayerSocialInsuranceNumber;?></tp:TaxpayerSocialInsuranceNumber>
-					<tp:TaxYear><?=$TaxYear?></tp:TaxYear>
+					<tp:TaxpayerSocialInsuranceNumber><?=$taxpayerSocialInsuranceNumber;?></tp:TaxpayerSocialInsuranceNumber>
+					<tp:TaxYear><?=$taxYear?></tp:TaxYear>
 					<tp:TaxpayerBirthDate>1966-07-12</tp:TaxpayerBirthDate>
 					<tp:TaxpayerMaritalStatusCode>6</tp:TaxpayerMaritalStatusCode>
 					<tp:SelfEmployedSpouseDeadlineIndicator>0</tp:SelfEmployedSpouseDeadlineIndicator>
@@ -46,8 +107,8 @@ $ReturnLines = array(
 				</tp:TaxpayerResidenceData>
 				<tp:TaxpayerContactData>
 					<comm:TaxpayerName>
-						<comm:GivenName><?=$GivenName;?></comm:GivenName>
-						<comm:FamilyName><?=$FamilyName;?></comm:FamilyName>
+						<comm:GivenName><?=$givenName;?></comm:GivenName>
+						<comm:FamilyName><?=$familyName;?></comm:FamilyName>
 					</comm:TaxpayerName>
 					<tp:TaxpayerMailingAddress>
 						<comm:CanadianMailingAddress>
@@ -70,295 +131,12 @@ $ReturnLines = array(
 				<t1:ElectionsCanadaAuthorizationIndicator>02</t1:ElectionsCanadaAuthorizationIndicator>
 				<t1:GSTHSTCreditApplicationIndicator>1</t1:GSTHSTCreditApplicationIndicator>
 			</t1:RelatedProgramData>
-			<?php foreach ($ReturnLines as $line): ?>
+			<?php foreach ($returnLines as $line): ?>
 			<comm:ReturnLine>
 				<comm:FieldCode><?=$line['code']?></comm:FieldCode>
 				<comm:FieldValue><?=$line['value']?></comm:FieldValue>
 			</comm:ReturnLine>
 			<?php endforeach;?>
-			<t1:SelectedFinancialDataRecordCount>06</t1:SelectedFinancialDataRecordCount>
-			<sfd:SelectedFinancialData>
-				<sfd:RealEstateRentalData>
-					<sfd:BusinessNumber>123456789RT1234</sfd:BusinessNumber>
-					<sfd:NAICSCode>531111</sfd:NAICSCode>
-					<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
-					<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
-					<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
-					<sfd:BusinessOwnershipPercent>8450</sfd:BusinessOwnershipPercent>
-					<sfd:FinalBusinessYearIndicator>1</sfd:FinalBusinessYearIndicator>
-					<sfd:PartnerCoOwnerData>
-						<sfd:PartnerName>
-							<comm:GivenName>John</comm:GivenName>
-							<comm:FamilyName>Doe</comm:FamilyName>
-						</sfd:PartnerName>
-						<sfd:PartnerPIN>0</sfd:PartnerPIN>
-						<sfd:PartnerBusinessOwnershipPercent>155000</sfd:PartnerBusinessOwnershipPercent>
-					</sfd:PartnerCoOwnerData>
-      					<comm:ReturnLine> 
-        					<comm:FieldCode>8230</comm:FieldCode> 
-        					<comm:FieldValue>2500</comm:FieldValue> 
-      					</comm:ReturnLine> 
-      					<comm:ReturnLine> 
-        					<comm:FieldCode>8299</comm:FieldCode> 
-        					<comm:FieldValue>2500</comm:FieldValue> 
-      					</comm:ReturnLine> 
-      					<comm:ReturnLine> 
-        					<comm:FieldCode>8710</comm:FieldCode> 
-        					<comm:FieldValue>600</comm:FieldValue> 
-      					</comm:ReturnLine> 
-      					<comm:ReturnLine> 
-        					<comm:FieldCode>9180</comm:FieldCode> 
-        					<comm:FieldValue>900</comm:FieldValue> 
-      					</comm:ReturnLine> 
-      					<comm:ReturnLine> 
-        					<comm:FieldCode>9369</comm:FieldCode> 
-        					<comm:FieldValue>1300</comm:FieldValue> 
-      					</comm:ReturnLine> 
-      					<comm:ReturnLine> 
-        					<comm:FieldCode>9946</comm:FieldCode> 
-        					<comm:FieldValue>1000</comm:FieldValue> 
-      					</comm:ReturnLine> 
-				</sfd:RealEstateRentalData>
-			</sfd:SelectedFinancialData>
-			<sfd:SelectedFinancialData>
-				<sfd:BusinessActivityData>
-					<sfd:BusinessNumber>334455667AA8990</sfd:BusinessNumber>
-					<sfd:NAICSCode>123456</sfd:NAICSCode>
-					<sfd:BusinessName>HAPPY TAXES LTD.</sfd:BusinessName>
-					<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
-					<sfd:TaxShelterNumber>AA123456</sfd:TaxShelterNumber>
-					<sfd:BusinessAddress>
-						<comm:BusinessAddressStreetText>12 GREEN ST.</comm:BusinessAddressStreetText>
-						<comm:AddressPostalCode>K1B2F9</comm:AddressPostalCode>
-					</sfd:BusinessAddress>
-					<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
-					<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
-					<sfd:BusinessOwnershipPercent>8500</sfd:BusinessOwnershipPercent>
-					<sfd:FinalBusinessYearIndicator>1</sfd:FinalBusinessYearIndicator>
-					<sfd:PartnerCoOwnerData>
-						<sfd:PartnerName>
-							<comm:GivenName>MAC</comm:GivenName>
-							<comm:FamilyName>BLACK</comm:FamilyName>
-						</sfd:PartnerName>
-						<sfd:PartnerPIN>00000000</sfd:PartnerPIN>
-						<sfd:PartnerBusinessOwnershipPercent>150000</sfd:PartnerBusinessOwnershipPercent>
-					</sfd:PartnerCoOwnerData>
-			      		<comm:ReturnLine> 
-			        		<comm:FieldCode>8000</comm:FieldCode> 
-			        		<comm:FieldValue>55090</comm:FieldValue> 
-	      				</comm:ReturnLine> 
-	      				<comm:ReturnLine> 
-	        				<comm:FieldCode>8299</comm:FieldCode> 
-	        				<comm:FieldValue>55090</comm:FieldValue> 
-	      				</comm:ReturnLine> 
-	      				<comm:ReturnLine> 
-	        				<comm:FieldCode>8690</comm:FieldCode> 
-	        				<comm:FieldValue>5090</comm:FieldValue> 
-	      				</comm:ReturnLine> 
-	      				<comm:ReturnLine> 
-	        				<comm:FieldCode>8760</comm:FieldCode> 
-	        				<comm:FieldValue>550</comm:FieldValue> 
-	      				</comm:ReturnLine> 
-	      				<comm:ReturnLine> 
-	        				<comm:FieldCode>8960</comm:FieldCode> 
-	        				<comm:FieldValue>400</comm:FieldValue> 
-	      				</comm:ReturnLine> 
-	      				<comm:ReturnLine> 
-	        				<comm:FieldCode>9060</comm:FieldCode> 
-	        				<comm:FieldValue>42000</comm:FieldValue> 
-	      				</comm:ReturnLine> 
-	      				<comm:ReturnLine> 
-	        				<comm:FieldCode>9180</comm:FieldCode> 
-	        				<comm:FieldValue>700</comm:FieldValue> 
-	      				</comm:ReturnLine> 
-	      				<comm:ReturnLine> 
-	        				<comm:FieldCode>9281</comm:FieldCode> 
-	        				<comm:FieldValue>5350</comm:FieldValue> 
-	      				</comm:ReturnLine> 
-	      				<comm:ReturnLine> 
-	        				<comm:FieldCode>9369</comm:FieldCode> 
-	        				<comm:FieldValue>3090</comm:FieldValue> 
-	      				</comm:ReturnLine> 
-	      				<comm:ReturnLine> 
-	        				<comm:FieldCode>9946</comm:FieldCode> 
-	        				<comm:FieldValue>2000</comm:FieldValue> 
-	      				</comm:ReturnLine> 
-				</sfd:BusinessActivityData>
-			</sfd:SelectedFinancialData>
-			<sfd:SelectedFinancialData>
-				<sfd:ProfessionalActivityData>
-					<sfd:BusinessNumber>123456789AA2345</sfd:BusinessNumber>
-					<sfd:NAICSCode>541110</sfd:NAICSCode>
-					<sfd:BusinessName>James Publishing</sfd:BusinessName>
-					<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
-					<sfd:TaxShelterNumber>AB123456</sfd:TaxShelterNumber>
-					<sfd:BusinessAddress>
-						<comm:BusinessAddressStreetText>20 Spicer Street</comm:BusinessAddressStreetText>
-						<comm:AddressPostalCode>R2Y1C4</comm:AddressPostalCode>
-					</sfd:BusinessAddress>
-					<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
-					<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
-					<sfd:BusinessOwnershipPercent>0000</sfd:BusinessOwnershipPercent>
-					<sfd:FinalBusinessYearIndicator>2</sfd:FinalBusinessYearIndicator>
-					<sfd:PartnerCoOwnerData>
-						<sfd:PartnerName>
-							<comm:GivenName></comm:GivenName>
-							<comm:FamilyName></comm:FamilyName>
-						</sfd:PartnerName>
-						<sfd:PartnerPIN>00000000</sfd:PartnerPIN>
-						<sfd:PartnerBusinessOwnershipPercent>0</sfd:PartnerBusinessOwnershipPercent>
-					</sfd:PartnerCoOwnerData>
-					<comm:ReturnLine>
-						<comm:FieldCode>8000</comm:FieldCode>
-						<comm:FieldValue>8000</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>8299</comm:FieldCode>
-						<comm:FieldValue>8000</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>8521</comm:FieldCode>
-						<comm:FieldValue>500</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>8810</comm:FieldCode>
-						<comm:FieldValue>500</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>8811</comm:FieldCode>
-						<comm:FieldValue>300</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>9060</comm:FieldCode>
-						<comm:FieldValue>3000</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>9270</comm:FieldCode>
-						<comm:FieldValue>1000</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>9368</comm:FieldCode>
-						<comm:FieldValue>5300</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>9369</comm:FieldCode>
-						<comm:FieldValue>2700</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>9946</comm:FieldCode>
-						<comm:FieldValue>2700</comm:FieldValue>
-					</comm:ReturnLine>
-				</sfd:ProfessionalActivityData>	
-			</sfd:SelectedFinancialData>
-			<sfd:SelectedFinancialData>
-				<sfd:FishingActivityData>
-					<sfd:BusinessNumber>123456789AA2345</sfd:BusinessNumber>
-					<sfd:NAICSCode>114133</sfd:NAICSCode>
-					<sfd:BoatName>Colin's Fishery</sfd:BoatName>
-					<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
-					<sfd:TaxShelterNumber>AA123456</sfd:TaxShelterNumber>
-					<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
-					<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
-					<sfd:BusinessOwnershipPercent>0000</sfd:BusinessOwnershipPercent>
-					<sfd:FinalBusinessYearIndicator>1</sfd:FinalBusinessYearIndicator>
-					<sfd:PartnerCoOwnerData>
-						<sfd:PartnerName>
-							<comm:GivenName></comm:GivenName>
-							<comm:FamilyName></comm:FamilyName>
-						</sfd:PartnerName>
-						<sfd:PartnerPIN>00000000</sfd:PartnerPIN>
-						<sfd:PartnerBusinessOwnershipPercent>0</sfd:PartnerBusinessOwnershipPercent>
-					</sfd:PartnerCoOwnerData>
-					<comm:ReturnLine>
-						<comm:FieldCode>8299</comm:FieldCode>
-						<comm:FieldValue>7500</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>8523</comm:FieldCode>
-						<comm:FieldValue>310</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>9060</comm:FieldCode>
-						<comm:FieldValue>4000</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>8963</comm:FieldCode>
-						<comm:FieldValue>3000</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>9369</comm:FieldCode>
-						<comm:FieldValue>-810</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>9946</comm:FieldCode>
-						<comm:FieldValue>-810</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>9932</comm:FieldCode>
-						<comm:FieldValue>3000</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-						<comm:FieldCode>9933</comm:FieldCode>
-						<comm:FieldValue>10000</comm:FieldValue>
-					</comm:ReturnLine>
-				</sfd:FishingActivityData>
-			</sfd:SelectedFinancialData>
-			<sfd:SelectedFinancialData>
-				<sfd:EmploymentExpenseData>
-					<comm:ReturnLine>
-							<comm:FieldCode>8862</comm:FieldCode>
-							<comm:FieldValue>350</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-							<comm:FieldCode>8520</comm:FieldCode>
-							<comm:FieldValue>500</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-							<comm:FieldCode>9281</comm:FieldCode>
-							<comm:FieldValue>1250</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-							<comm:FieldCode>8523</comm:FieldCode>
-							<comm:FieldValue>125</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-							<comm:FieldCode>9200</comm:FieldCode>
-							<comm:FieldValue>475</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-							<comm:FieldCode>8910</comm:FieldCode>
-							<comm:FieldValue>100</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-							<comm:FieldCode>8810</comm:FieldCode>
-							<comm:FieldValue>1750</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-							<comm:FieldCode>9270</comm:FieldCode>
-							<comm:FieldValue>600</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-							<comm:FieldCode>9945</comm:FieldCode>
-							<comm:FieldValue>270</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-							<comm:FieldCode>9368</comm:FieldCode>
-							<comm:FieldValue>5420</comm:FieldValue>
-					</comm:ReturnLine>
-				</sfd:EmploymentExpenseData>
-			</sfd:SelectedFinancialData>
-			<sfd:SelectedFinancialData>
-				<sfd:MealLodgingExpenseData>
-					<comm:ReturnLine>
-							<comm:FieldCode>8523</comm:FieldCode>
-							<comm:FieldValue>1500</comm:FieldValue>
-					</comm:ReturnLine>
-					<comm:ReturnLine>
-							<comm:FieldCode>9200</comm:FieldCode>
-							<comm:FieldValue>2500</comm:FieldValue>
-					</comm:ReturnLine>
-				</sfd:MealLodgingExpenseData>
-			</sfd:SelectedFinancialData>
 		</t1:T1Return>
 	</net:T1Netfile>
 </net:Netfile>
