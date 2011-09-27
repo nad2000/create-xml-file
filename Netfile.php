@@ -61,22 +61,22 @@ $SoftwareRevisionDate='2011-08-06';
 
 // Tax reuturns data - should be supplied from DB
 // Taxpayer data:
-$taxpayerSocialInsuranceNumber = '111111118';
 $taxYear = 2010;
 //...
-$givenName = 'John';
-$familyName = 'Doe';
 
-$data = DataSource::getData( $userYd = 2, $taxYear = $taxYear);
+$data = DataSource::getData( $userId = 2, $taxYear = $taxYear);
 
 // ReturnLines
 $returnLines = array();
 
 foreach( $data as $row ) {
+	$lineId = $row->line_id;
 	if (	$row->line_type == 'TRC_L' 
 			&& $row->field_code >= 100
 			&& $row->field_code <= 8000)
 		$returnLines[] = (object) array( 'code'=>$row->field_code, 'value'=>$row->line_value);
+	elseif ( in_array ( $lineId, array( 'TaxpayerSocialInsuranceNumber', 'GivenName', 'FamilyName' )) )
+		${lcfirst($lineId)} = $row->line_value;
 }
 
 ?>

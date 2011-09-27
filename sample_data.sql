@@ -133,5 +133,10 @@ REPLACE INTO result_data
 VALUES
     ( 2, 2010, 'TaxpayerSocialInsuranceNumber', '0', '', '', 0, 0, '111111118' ),
     ( 2, 2010, 'GivenName', '0', '', '', 0, 0, 'John' ),
-    ( 2, 2010, 'FamilyName', '0', '', '', 0, 0, 'Doe' );
-
+    ( 2, 2010, 'FamilyName', '0', '', '', 0, 0, 'Doe' ),
+    ( 2, 2010, 'TaxYear', '0', '', '', 0, 0, '2010' ),
+    ( 2, 2010, 'TaxpayerBirthDate', '0', '', '', 0, 0, '1966-07-12' ),
+    ( 2, 2010, 'TaxpayerMaritalStatusCode', '0', '', '', 0, 0, '6' ),
+    ( 2, 2010, 'SelfEmployedSpouseDeadlineIndicator', '0', '', '', 0, 0, '0' ),
+    ( 2, 2010, 'TaxpayerYearEndResidenceProvinceCode', '0', '', '', 0, 0, 'NS' ),
+    ( 2, 2010, 'TaxpayerCurrentResidenceProvinceCode', '0', '', '', 0, 0, 'NS' );
