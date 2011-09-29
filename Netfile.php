@@ -1,5 +1,39 @@
 <?php
 
+function libxml_display_error($error) 
+{ 
+    $return = "<br/>\n"; 
+    switch ($error->level) { 
+        case LIBXML_ERR_WARNING: 
+            $return .= "<b>Warning $error->code</b>: "; 
+            break; 
+        case LIBXML_ERR_ERROR: 
+            $return .= "<b>Error $error->code</b>: "; 
+            break; 
+        case LIBXML_ERR_FATAL: 
+            $return .= "<b>Fatal Error $error->code</b>: "; 
+            break; 
+    } 
+    $return .= trim($error->message); 
+    if ($error->file) { 
+        $return .=    " in <b>$error->file</b>"; 
+    } 
+    $return .= " on line <b>$error->line</b>\n"; 
+
+    return $return; 
+} 
+
+function libxml_display_errors() { 
+    $errors = libxml_get_errors(); 
+    foreach ($errors as $error) { 
+        print libxml_display_error($error); 
+    } 
+    libxml_clear_errors(); 
+} 
+
+// Enable user error handling 
+libxml_use_internal_errors(true); 
+
 /**
  * Data access component
  */
@@ -52,10 +86,13 @@ class DataSource {
 
 }
 
+
 // TODO: Encapsulate into a class
 
+ob_start();
 // to run from CLI: php -f Netfile.php | more
-echo '<?xml version="1.0"?>';
+echo '<?xml version="1.0"?>
+';
 $SoftwareID='061G';
 $SoftwareRevisionDate='2011-08-06';
 
@@ -63,6 +100,79 @@ $SoftwareRevisionDate='2011-08-06';
 // Taxpayer data:
 $taxYear = 2010;
 //...
+
+// Element list of elemts wiht values
+$elementList = array(
+	'AddressPostalCode',
+	'AddressProvinceCode',
+	'AlternateAddressAuthorizationCode',
+	'BoatName',
+	'BusinessAddressStreetText',
+	'BusinessName',
+	'BusinessOwnershipPercent',
+	'CanadianCitizenshipIndicator',
+	'CorrespondenceLanguageCode',
+	'ElectionsCanadaAuthorizationIndicator',
+	'FamilyName',
+	'FinalBusinessYearIndicator',
+	'FiscalPeriodEndDate',
+	'FiscalPeriodStartDate',
+	'GivenName',
+	'GSTHSTCreditApplicationIndicator',
+	'NAICSCode',
+	'PartnerBusinessOwnershipPercent',
+	'PartnerPIN',
+	'PartnershipNumber',
+	'SelectedFinancialDataRecordCount',
+	'SelfEmployedSpouseDeadlineIndicator',
+	'TaxpayerBirthDate',
+	'TaxpayerCurrentResidenceProvinceCode',
+	'TaxpayerMaritalStatusCode',
+	'TaxpayerSocialInsuranceNumber',
+	'TaxpayerYearEndResidenceProvinceCode',
+	'TaxShelterNumber',
+	'TaxYear',
+	'TelephoneAreaCode',
+	'TelephoneLocalNumber' );
+
+// default element values:
+foreach ($elementList as $elment) {
+	${$elment} = '';
+}
+/* 
+// Uncomment, if you need to set other default vlues
+$addressPostalCode='';
+$addressProvinceCode='';
+$alternateAddressAuthorizationCode='';
+$boatName='';
+$businessAddressStreetText='';
+$businessName='';
+$businessOwnershipPercent='';
+$canadianCitizenshipIndicator='';
+$correspondenceLanguageCode='';
+$electionsCanadaAuthorizationIndicator='';
+$familyName='';
+$finalBusinessYearIndicator='';
+$fiscalPeriodEndDate='';
+$fiscalPeriodStartDate='';
+$givenName='';
+$gSTHSTCreditApplicationIndicator='';
+$nAICSCode='';
+$partnerBusinessOwnershipPercent='';
+$partnerPIN='';
+$partnershipNumber='';
+$selectedFinancialDataRecordCount='';
+$selfEmployedSpouseDeadlineIndicator='';
+$taxpayerBirthDate='';
+$taxpayerCurrentResidenceProvinceCode='';
+$taxpayerMaritalStatusCode='';
+$taxpayerSocialInsuranceNumber='';
+$taxpayerYearEndResidenceProvinceCode='';
+$taxShelterNumber='';
+$taxYear='';
+$telephoneAreaCode='';
+$telephoneLocalNumber='';
+*/
 
 $data = DataSource::getData( $userId = 2, $taxYear = $taxYear);
 
@@ -75,7 +185,7 @@ foreach( $data as $row ) {
 			&& $row->field_code >= 100
 			&& $row->field_code <= 8000)
 		$returnLines[] = (object) array( 'code'=>$row->field_code, 'value'=>$row->line_value);
-	elseif ( in_array ( $lineId, array( 'TaxpayerSocialInsuranceNumber', 'GivenName', 'FamilyName' )) )
+	elseif ( in_array ( $lineId, $elementList ) )
 		${lcfirst($lineId)} = $row->line_value;
 }
 
@@ -86,9 +196,7 @@ foreach( $data as $row ) {
 	xmlns:sdt="http://www.cra-arc.gc.ca/xmlns/sdt/2-0-0" 
 	xmlns:sfd="http://www.cra-arc.gc.ca/xmlns/sfd/2012/1-0-0" 
 	xmlns:t1="http://www.cra-arc.gc.ca/xmlns/t1/2012/1-0-0" 
-	xmlns:tp="http://www.cra-arc.gc.ca/xmlns/tp/2012/1-0-0" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="http://www.cra-arc.gc.ca/xmlns/netfile/2012/1-0-0 netfile.xsd">
+	xmlns:tp="http://www.cra-arc.gc.ca/xmlns/tp/2012/1-0-0">
 	<net:T1Netfile>
 		<t1:T1Return>
 			<comm:SoftwareID><?=$SoftwareID?></comm:SoftwareID>
@@ -97,39 +205,39 @@ foreach( $data as $row ) {
 				<tp:TaxpayerBasicData>
 					<tp:TaxpayerSocialInsuranceNumber><?=$taxpayerSocialInsuranceNumber;?></tp:TaxpayerSocialInsuranceNumber>
 					<tp:TaxYear><?=$taxYear?></tp:TaxYear>
-					<tp:TaxpayerBirthDate>1966-07-12</tp:TaxpayerBirthDate>
-					<tp:TaxpayerMaritalStatusCode>6</tp:TaxpayerMaritalStatusCode>
-					<tp:SelfEmployedSpouseDeadlineIndicator>0</tp:SelfEmployedSpouseDeadlineIndicator>
+					<tp:TaxpayerBirthDate><?=$taxpayerBirthDate?></tp:TaxpayerBirthDate>
+					<tp:TaxpayerMaritalStatusCode><?=$taxpayerMaritalStatusCode?></tp:TaxpayerMaritalStatusCode>
+					<tp:SelfEmployedSpouseDeadlineIndicator><?=$SelfEmployedSpouseDeadlineIndicator?></tp:SelfEmployedSpouseDeadlineIndicator>
 				</tp:TaxpayerBasicData>
 				<tp:TaxpayerResidenceData>
-					<tp:TaxpayerYearEndResidenceProvinceCode>NS</tp:TaxpayerYearEndResidenceProvinceCode>
-					<tp:TaxpayerCurrentResidenceProvinceCode>NS</tp:TaxpayerCurrentResidenceProvinceCode>
+					<tp:TaxpayerYearEndResidenceProvinceCode><?=$taxpayerYearEndResidenceProvinceCode?></tp:TaxpayerYearEndResidenceProvinceCode>
+					<tp:TaxpayerCurrentResidenceProvinceCode><?=$taxpayerCurrentResidenceProvinceCode?></tp:TaxpayerCurrentResidenceProvinceCode>
 				</tp:TaxpayerResidenceData>
 				<tp:TaxpayerContactData>
 					<comm:TaxpayerName>
-						<comm:GivenName><?=$givenName;?></comm:GivenName>
-						<comm:FamilyName><?=$familyName;?></comm:FamilyName>
+						<comm:GivenName><?=$givenName?></comm:GivenName>
+						<comm:FamilyName><?=$familyName?></comm:FamilyName>
 					</comm:TaxpayerName>
 					<tp:TaxpayerMailingAddress>
 						<comm:CanadianMailingAddress>
-							<comm:AddressStreetText></comm:AddressStreetText>
-							<comm:AddressMunicipalityName></comm:AddressMunicipalityName>
-							<comm:AddressProvinceCode>NS</comm:AddressProvinceCode>
-							<comm:AddressPostalCode>B0W3T0</comm:AddressPostalCode>
+							<comm:AddressStreetText><?=$addressStreetText?></comm:AddressStreetText>
+							<comm:AddressMunicipalityName><?=$addressMunicipalityName?></comm:AddressMunicipalityName>
+							<comm:AddressProvinceCode><?=$addressProvinceCode?></comm:AddressProvinceCode>
+							<comm:AddressPostalCode><?=$addressPostalCode?></comm:AddressPostalCode>
 						</comm:CanadianMailingAddress>
 					</tp:TaxpayerMailingAddress>
 					<tp:TaxpayerHomeTelephoneNumber>
-						<comm:TelephoneAreaCode>613</comm:TelephoneAreaCode>
-						<comm:TelephoneLocalNumber>5551234</comm:TelephoneLocalNumber>
+						<comm:TelephoneAreaCode><?=$telephoneAreaCode?></comm:TelephoneAreaCode>
+						<comm:TelephoneLocalNumber><?=$telephoneLocalNumber?></comm:TelephoneLocalNumber>
 					</tp:TaxpayerHomeTelephoneNumber>
-					<tp:AlternateAddressAuthorizationCode>00</tp:AlternateAddressAuthorizationCode>
-					<tp:CorrespondenceLanguageCode>2</tp:CorrespondenceLanguageCode>
+					<tp:AlternateAddressAuthorizationCode><?=$alternateAddressAuthorizationCode?></tp:AlternateAddressAuthorizationCode>
+					<tp:CorrespondenceLanguageCode><?=$correspondenceLanguageCode?></tp:CorrespondenceLanguageCode>
 				</tp:TaxpayerContactData>
 			</t1:TaxpayerData>
 			<t1:RelatedProgramData>
-				<t1:CanadianCitizenshipIndicator>1</t1:CanadianCitizenshipIndicator>
-				<t1:ElectionsCanadaAuthorizationIndicator>02</t1:ElectionsCanadaAuthorizationIndicator>
-				<t1:GSTHSTCreditApplicationIndicator>1</t1:GSTHSTCreditApplicationIndicator>
+				<t1:CanadianCitizenshipIndicator><?=$canadianCitizenshipIndicator?></t1:CanadianCitizenshipIndicator>
+				<t1:ElectionsCanadaAuthorizationIndicator><?=$electionsCanadaAuthorizationIndicator?></t1:ElectionsCanadaAuthorizationIndicator>
+				<t1:GSTHSTCreditApplicationIndicator><?=$gSTHSTCreditApplicationIndicator?></t1:GSTHSTCreditApplicationIndicator>
 			</t1:RelatedProgramData>
 <?php foreach ($returnLines as $line): ?>
 			<comm:ReturnLine>
@@ -140,3 +248,16 @@ foreach( $data as $row ) {
 		</t1:T1Return>
 	</net:T1Netfile>
 </net:Netfile>
+<?php
+$xmlStr=ob_get_contents();
+ob_end_clean();
+
+$xml = new DOMDocument(); 
+$xml->loadXML($xmlStr);
+
+if (!$xml->schemaValidate('xsd/netfile.xsd')) { 
+    print 'DOMDocument::schemaValidate() Generated Errors!'; 
+    libxml_display_errors(); 
+}
+
+echo $xml->saveXML();

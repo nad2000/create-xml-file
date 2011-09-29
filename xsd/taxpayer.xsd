@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xsd:schema xmlns:tp="http://www.cra-arc.gc.ca/xmlns/tp/2012/1-0-0" xmlns:sdt="http://www.cra-arc.gc.ca/xmlns/sdt/2-0-0" xmlns:comm="http://www.cra-arc.gc.ca/xmlns/comm/2012/1-0-0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.cra-arc.gc.ca/xmlns/tp/2012/1-0-0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="tp/2012/1-0-0">
+	<xsd:import namespace="http://www.cra-arc.gc.ca/xmlns/comm/2012/1-0-0" schemaLocation="electronicfilingcommon.xsd"/>
+	<xsd:import namespace="http://www.cra-arc.gc.ca/xmlns/sdt/2-0-0" schemaLocation="standarddatatypes.xsd"/>
+	<xsd:element name="TaxpayerBasicData" type="tp:IndividualBasicDataType"/>
+	<xsd:complexType name="IndividualBasicDataType">
+		<xsd:sequence>
+			<xsd:element ref="tp:TaxpayerSocialInsuranceNumber"/>
+			<xsd:element ref="tp:TaxYear"/>
+			<xsd:element ref="tp:TaxpayerBirthDate"/>
+			<xsd:element ref="tp:TaxpayerMaritalStatusCode"/>
+			<xsd:element ref="tp:SelfEmployedSpouseDeadlineIndicator"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="TaxpayerSocialInsuranceNumber">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Must pass MOD-10 check</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Doit passer le contrôle MOD-10.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="comm:IndividualSocialInsuranceNumberType">
+				<xsd:length value="9"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="TaxYear" type="sdt:YearType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Indicates for which tax year is this return being filed. Format YYYY.</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Indique l'année d'imposition pour laquelle la déclaration est transmise. Le format est AAAA.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="TaxpayerBirthDate" type="tp:IndividualBirthDateType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Format is YYYY-MM-DD</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Le format est AAAA-MM-JJ</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:simpleType name="IndividualBirthDateType">
+		<xsd:restriction base="sdt:DateType"/>
+	</xsd:simpleType>
+	<xsd:element name="TaxpayerMaritalStatusCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Valid values are: 1 - Married, 2 - Living common-law, 3 - Widow(er), 4 - Divorced, 5 - Separated, 6 - Single</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Les valeurs valides sont les suivantes : 1 - Marié, 2 - Conjoint de fait, 3 - Veuf(ve), 4 - Divorcé, 5 - Séparé, 6 - Célibataire</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="tp:IndividualMaritalStatusCodeType">
+				<xsd:length value="1"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:simpleType name="IndividualMaritalStatusCodeType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Valid values are: 1 - Married, 2 - Living common-law, 3 - Widow(er), 4 - Divorced, 5 - Separated, 6 - Single</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Les valeurs valides sont les suivantes : 1 - Marié, 2 - Conjoint de fait, 3 - Veuf(ve), 4 - Divorcé, 5 - Séparé, 6 - Célibataire</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="sdt:CodeType">
+			<xsd:length value="1"/>
+			<xsd:enumeration value="1"/>
+			<xsd:enumeration value="2"/>
+			<xsd:enumeration value="3"/>
+			<xsd:enumeration value="4"/>
+			<xsd:enumeration value="5"/>
+			<xsd:enumeration value="6"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="SelfEmployedSpouseDeadlineIndicator" type="sdt:IndicatorType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Value "0" (the default value, equal to false). Value "1" means the taxpayer is a spouse of an individual who carried on a business in 2011. </xsd:documentation>
+			<xsd:documentation xml:lang="fr">Valeur "0" ( La valeur par défaut est établie à faux). Valeur "1" veut dire que le contribuable est l'époux d'un travailleur indépendant pour l'année 2011.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="TaxpayerResidenceData" type="tp:IndividualResidenceDataType"/>
+	<xsd:complexType name="IndividualResidenceDataType">
+		<xsd:sequence>
+			<xsd:element ref="tp:TaxpayerYearEndResidenceProvinceCode"/>
+			<xsd:element ref="tp:TaxpayerCurrentResidenceProvinceCode" minOccurs="0"/>
+			<xsd:element ref="tp:YukonFirstNationsSettlementNumber" minOccurs="0"/>
+			<xsd:element ref="tp:AboriginalLandResidenceIndicator" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="TaxpayerYearEndResidenceProvinceCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Taxpayers province of residence as of December 31st of the taxation year. Must be one of the following abbreviations: NL - Newfoundland, PE - Prince Edward Island, NS - Nova Scotia, NB - New Brunswick, QC - Quebec, ON - Ontario, MB - Manitoba, SK - Saskatchewan, AB - Alberta, BC - British Columbia, YT - Yukon, NU - Nunavut, NT - Northwest Territories</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Province de résidence du contribuable en date du 31 décembre de l'année d'imposition. Doit être l'une des abréviations suivantes: NL - Terre-Neuve-et-Labrador, PE - Île-du-Prince-Édouard, NS - Nouvelle-Écosse, NB - Nouveau-Brunswick, QC - Québec, ON - Ontario, MB - Manitoba, SK - Saskatchewan, AB - Alberta, BC - Colombie-Britannique, YT - Yukon, NU - Nunavut, NT - Territoires du Nord-Ouest</xsd:documentation>
+		</xsd:annotation>
+		
+		<xsd:simpleType>
+			<xsd:restriction base="comm:CanadianProvinceCodeType">
+				<xsd:length value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="TaxpayerCurrentResidenceProvinceCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Province or territory of residence where the client lives now if different from their mailing address. Must be one of the following abbreviations: NL - Newfoundland, PE - Prince Edward Island, NS - Nova Scotia, NB - New Brunswick, QC - Quebec, ON - Ontario, MB - Manitoba, SK - Saskatchewan, AB - Alberta, BC - British Columbia, YT - Yukon, NU - Nunavut, NT - Northwest Territories</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Province ou territoire de résidence où vit actuellement le client si celle-ci diffère de son adresse postale. Doit être l'une des abréviations suivantes: NL - Terre-Neuve-et-Labrador, PE - Île-du-Prince-Édouard, NS - Nouvelle-Écosse, NB - Nouveau-Brunswick, QC - Québec, ON - Ontario, MB - Manitoba, SK - Saskatchewan, AB - Alberta, BC - Colombie-Britannique, YT - Yukon, NU - Nunavut, NT - Territoires du Nord-Ouest</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="comm:CanadianProvinceCodeType">
+				<xsd:length value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="YukonFirstNationsSettlementNumber">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">11001 = Carcross/Tagish; 11002 = Champagne and Aishihik; 11003 = Kluane; 11004 = Kwanlin Dun; 11006 = Little Salmon/Carmacks; 11007 = Nacho Nyak Dun; 11009 = Selkirk; 11010 = Ta'an Kwach'an Council; 11011 = Teslin Tlingit; 11012 = Tr'ondëk Hwëch'in; 11013 = Vuntut Gwitchin
+</xsd:documentation>
+			<xsd:documentation xml:lang="fr">11001 = Carcross/Tagish, 11002 = Champagne et Aishihik, 11003 = Kluane, 11004 = Kwanlin Dun, 11006 = Little Salmon/Carmacks, 11007 = Nacho Nyak Dun, 11009 = Selkirk, 11010 = Ta'an Kwach'an Council, 11011 = Teslin Tlingit, 11012 = Tr'ondëk Hwëch'in, 11013 = Vuntut Gwitchin</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="5"/>
+				<xsd:enumeration value="11001"/>
+				<xsd:enumeration value="11002"/>
+				<xsd:enumeration value="11003"/>
+				<xsd:enumeration value="11004"/>
+				<xsd:enumeration value="11006"/>
+				<xsd:enumeration value="11007"/>
+				<xsd:enumeration value="11009"/>
+				<xsd:enumeration value="11010"/>
+				<xsd:enumeration value="11011"/>
+				<xsd:enumeration value="11012"/>
+				<xsd:enumeration value="11013"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="AboriginalLandResidenceIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Valid values: 1=Yes, 2=No</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Les valeurs valides sont les suivantes:1=Oui, 2=Non</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="TaxpayerSpouseData" type="tp:IndividualSpouseDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional Group</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Groupe optionnel</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="IndividualSpouseDataType">
+		<xsd:sequence>
+			<xsd:element ref="tp:SpouseSocialInsuranceNumber"/>
+			<xsd:element ref="tp:SpouseGivenName" minOccurs="0"/>
+			<xsd:element ref="tp:SpouseNetIncomeAmount" minOccurs="0"/>
+			<xsd:element ref="tp:SpouseUniversalChildCareBenefitAmount" minOccurs="0"/>
+			<xsd:element ref="tp:SpouseUniversalChildCareRepaymentAmount" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="SpouseSocialInsuranceNumber">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Required if there is a spouse. Must pass MOD-10 check.</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Requis s'il y a un époux. Doit passer le contrôle MOD-10.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="comm:IndividualSocialInsuranceNumberType">
+				<xsd:length value="9"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="SpouseGivenName">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:simpleContent>
+				<xsd:restriction base="comm:IndividualGivenNameType">
+					<xsd:maxLength value="4"/>
+				</xsd:restriction>
+			</xsd:simpleContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SpouseNetIncomeAmount">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional field or enter zeros if not applying</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Champ optionnel ou entrer des zéros si ce n'est pas requis.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:AmountDollarsOnlyType">
+				<xsd:pattern value="[0-9]{1,9}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="SpouseUniversalChildCareBenefitAmount">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:AmountDollarsOnlyType">
+				<xsd:pattern value="[0-9]{1,9}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="SpouseUniversalChildCareRepaymentAmount">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:AmountDollarsOnlyType">
+				<xsd:pattern value="[0-9]{1,9}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="TaxpayerContactData" type="tp:IndividualContactDataType"/>
+	<xsd:complexType name="IndividualContactDataType">
+		<xsd:sequence>
+			<xsd:element ref="comm:TaxpayerName"/>
+			<xsd:element ref="tp:NameChangeIndicator" minOccurs="0"/>
+			<xsd:element ref="tp:TaxpayerMailingAddress"/>
+			<xsd:element ref="tp:TaxpayerHomeTelephoneNumber" minOccurs="0"/>
+			<xsd:element ref="tp:AlternateAddressAuthorizationCode"/>
+			<xsd:element ref="tp:CorrespondenceLanguageCode"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="NameChangeIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional. Value "1" (No name change); Value "2" (New name); First Time Filers enter a "2"; If field is ommited value "1" is assumed</xsd:documentation>
+				<xsd:documentation xml:lang="fr">Optionnel. Valeur "1" (Aucun changement de nom); Valeur "2" (Nouveau nom); Pour les premiers déclarants entrer un "2"; Si le champ est omis, la valeur de "1" est assumée.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="TaxpayerMailingAddress" type="tp:MailingAddressType"/>
+	<xsd:complexType name="MailingAddressType">
+		<xsd:sequence>
+			<xsd:element ref="comm:AddressCareOfLineText" minOccurs="0"/>
+			<xsd:element ref="comm:CanadianMailingAddress"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="TaxpayerHomeTelephoneNumber" type="comm:NorthAmericanTelephoneNumberType"/>
+	<xsd:element name="AlternateAddressAuthorizationCode" default="00">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Values are: "01" (NOA and/or refund to be sent to preparer's mailing address); "02" (ONLY the NOA to be sent to the preparer's mailing address); "03"  (NOA and/or refund to be sent to the preparer's business address); "04" (ONLY the NOA to be sent to preparer's business address); Default Value is "00"</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Valeur "01" (L'avis de cotisation et/ou le remboursement seront envoyés à l'adresse postale du préparateur); "02" (SEULEMENT l'avis de cotisation sera envoyé à l'adresse postale du préparateur); "03"  (L'avis de cotisation et/ou le remboursement sera envoyé à l'adresse d'entreprise du préparateur); "04" (SEULEMENT l'avis de cotisation sera envoyé à l'adresse d'entreprise du préparateur); La valeur par défaut est "00".</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="2"/>
+				<xsd:enumeration value="00"/>
+				<xsd:enumeration value="01"/>
+				<xsd:enumeration value="02"/>
+				<xsd:enumeration value="03"/>
+				<xsd:enumeration value="04"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="CorrespondenceLanguageCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">- Value "1" (English); - Value "2" (French)</xsd:documentation>
+			<xsd:documentation xml:lang="fr">- Valeur "1" (anglais); - Valeur "2" (français)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+</xsd:schema>

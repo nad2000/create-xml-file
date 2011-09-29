@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xsd:schema xmlns:t1="http://www.cra-arc.gc.ca/xmlns/t1/2012/1-0-0" xmlns:sdt="http://www.cra-arc.gc.ca/xmlns/sdt/2-0-0" xmlns:sfd="http://www.cra-arc.gc.ca/xmlns/sfd/2012/1-0-0" xmlns:comm="http://www.cra-arc.gc.ca/xmlns/comm/2012/1-0-0" xmlns:tp="http://www.cra-arc.gc.ca/xmlns/tp/2012/1-0-0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.cra-arc.gc.ca/xmlns/t1/2012/1-0-0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="t1/2012/1-0-0">
+	<xsd:import namespace="http://www.cra-arc.gc.ca/xmlns/comm/2012/1-0-0" schemaLocation="electronicfilingcommon.xsd"/>
+	<xsd:import namespace="http://www.cra-arc.gc.ca/xmlns/tp/2012/1-0-0" schemaLocation="taxpayer.xsd"/>
+	<xsd:import namespace="http://www.cra-arc.gc.ca/xmlns/sfd/2012/1-0-0" schemaLocation="sfd.xsd"/>
+	<xsd:import namespace="http://www.cra-arc.gc.ca/xmlns/sdt/2-0-0" schemaLocation="standarddatatypes.xsd"/>
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">Schema for 2011 Income Tax Returns - Version 1-0-0</xsd:documentation>
+		<xsd:documentation xml:lang="fr">Schéma pour les  déclarations de revenus T1 de 2011 - Version 1-0-0</xsd:documentation>
+	</xsd:annotation>
+	<xsd:element name="T1Return" type="t1:T1ReturnType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">EOLP - There should be at least 1 and up to 30 returns in a file; EOL and NETFILE - There should be only 1 return in a file</xsd:documentation>
+			<xsd:documentation xml:lang="fr">TED en direct plus - Il devrait avoir au moins une et jusqu'à trente déclarations dans un fichier; TED en direct et IMPÔTNET - Il devrait avoir seulement une déclaration dans un fichier.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="T1ReturnType">
+		<xsd:sequence>
+			<xsd:element ref="comm:SoftwareID"/>
+			<xsd:element ref="comm:SoftwareRevisionDate"/>
+			<xsd:element ref="t1:TaxpayerData"/>
+			<xsd:element ref="t1:RelatedProgramData"/>
+			<xsd:element ref="t1:DeceasedData" minOccurs="0"/>
+			<xsd:element ref="t1:BankruptcyData" minOccurs="0"/>
+			<xsd:element ref="comm:ReturnLine" maxOccurs="90"/>
+			<xsd:element ref="t1:SelectedFinancialDataRecordCount" minOccurs="0"/>
+			<xsd:element ref="sfd:SelectedFinancialData" minOccurs="0" maxOccurs="6"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="TaxpayerData" type="t1:TaxpayerDataType"/>
+	<xsd:element name="RelatedProgramData" type="t1:RelatedProgramDataType"/>
+	<xsd:element name="DeceasedData" type="t1:DeceasedDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyData" type="t1:BankruptcyDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="SelectedFinancialDataRecordCount">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Number of SFD records associated with this tax return. Optional if there are no SFD records. </xsd:documentation>
+			<xsd:documentation xml:lang="fr">Nombre de DFC associés à la déclaration de revenus. Optionnel s'il n'y a pas de DFC. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:NumberType">
+				<xsd:length value="2"/>
+				<xsd:pattern value="[0-6]{2}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:complexType name="TaxpayerDataType">
+		<xsd:sequence>
+			<xsd:element ref="tp:TaxpayerBasicData"/>
+			<xsd:element ref="tp:TaxpayerResidenceData"/>
+			<xsd:element ref="tp:TaxpayerSpouseData" minOccurs="0"/>
+			<xsd:element ref="tp:TaxpayerContactData"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="RelatedProgramDataType">
+		<xsd:sequence>
+			<xsd:element ref="t1:CanadianCitizenshipIndicator"/>
+			<xsd:element ref="t1:ElectionsCanadaAuthorizationIndicator" minOccurs="0"/>
+			<xsd:element ref="t1:GSTHSTCreditApplicationIndicator"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CanadianCitizenshipIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Values are 1 for "Yes" and 2 for "No"</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Les valeurs sont 1 pour "Oui" et 2 pour "Non"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="ElectionsCanadaAuthorizationIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">01 - Yes, authorization given, 02 - No, authorization refused</xsd:documentation>
+			<xsd:documentation xml:lang="fr">01 - Oui, autorisation accordée, 02 - Non, autorisation refusée</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="2"/>
+				<xsd:enumeration value="01"/>
+				<xsd:enumeration value="02"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="GSTHSTCreditApplicationIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Value "1" (Yes), Value "2" (No)</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Valeur "1" (Oui), Valeur "2" (Non)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:complexType name="DeceasedDataType">
+		<xsd:sequence>
+			<xsd:element ref="t1:DeceasedIndicator"/>
+			<xsd:element ref="t1:DeathDate" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="DeceasedIndicator" type="sdt:IndicatorType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Indication that the return is for a deceased individual - Value "1" (Yes), - Value "0" (No)</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Indication que la déclaration est pour une personne décédée - Valeur "1" (Oui), - Valeur "0" (Non)</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="DeathDate" type="sdt:DateType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Must be entered if DeceasedIndicator is set to Yes (1). Can be omitted if DeceasedIndicator is set to No (0). Format is YYYY-MM-DD</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Doit être inscrite si l'indicateur de décès « DeceasedIndicator » est réglé à Oui (1). Peut être omis si DeceasedIndicator est réglé à Non (0). Le format est AAAA-MM-JJ.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="BankruptcyDataType">
+		<xsd:sequence>
+			<xsd:element ref="t1:BankruptcyIndicator"/>
+			<xsd:element ref="t1:PostBankruptcyNetIncomeAmount" minOccurs="0"/>
+			<xsd:element ref="t1:PostBankruptcyAdjustedNetIncomeAmount" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="BankruptcyIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Indication that the T1 is for a pre-bankrupt return - Value "1" (Yes),  - Value "0" (No)</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Indication que la T1 est une déclaration préfaillite - Valeur "1" (Oui),  - Valeur "0" (Non)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:IndicatorType"/>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="PostBankruptcyNetIncomeAmount">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional or zeros. The amount of net income from the post-bankrupt return</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel ou zéros. Le montant du revenu net de la déclaration post-faillite</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:AmountDollarsOnlyType">
+				<xsd:pattern value="[0-9]{1,9}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="PostBankruptcyAdjustedNetIncomeAmount">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional or zeros. The amount of adjusted net income from the post-bankrupt return</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel ou zéros. Le montant du revenu net rajusté de la déclaration post-faillite</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:AmountDollarsOnlyType">
+				<xsd:pattern value="[0-9]{1,9}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+</xsd:schema>

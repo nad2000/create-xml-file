@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xsd:schema xmlns:net="http://www.cra-arc.gc.ca/xmlns/netfile/2012/1-0-0" xmlns:t1="http://www.cra-arc.gc.ca/xmlns/t1/2012/1-0-0" xmlns:sfd="http://www.cra-arc.gc.ca/xmlns/sfd/2012/1-0-0" xmlns:comm="http://www.cra-arc.gc.ca/xmlns/comm/2012/1-0-0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.cra-arc.gc.ca/xmlns/netfile/2012/1-0-0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="netfile/2012/1-0-0">
+	<xsd:import namespace="http://www.cra-arc.gc.ca/xmlns/comm/2012/1-0-0" schemaLocation="electronicfilingcommon.xsd"/>
+	<xsd:import namespace="http://www.cra-arc.gc.ca/xmlns/t1/2012/1-0-0" schemaLocation="t1return.xsd"/>
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">Netfile Schema for 2011 Individual Income Tax Returns - Version 1-0-0</xsd:documentation>
+		<xsd:documentation xml:lang="fr">Schéma Impôtnet pour la déclaration de revenus T1 pour 2011 - Version 1-0-0</xsd:documentation>
+	</xsd:annotation>
+	<xsd:complexType name="NetfileType">
+		<xsd:sequence>
+			<xsd:element ref="net:T1Netfile"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="Netfile" type="net:NetfileType"/>
+	<xsd:complexType name="T1NetfileType">
+		<xsd:sequence>
+			<xsd:element ref="t1:T1Return"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="T1Netfile" type="net:T1NetfileType"/>
+	
+</xsd:schema>
