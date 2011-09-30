@@ -32,7 +32,9 @@ function libxml_display_errors() {
 } 
 
 // Enable user error handling 
-libxml_use_internal_errors(true); 
+libxml_use_internal_errors(true);
+libxml_disable_entity_loader( false);
+
 
 /**
  * Data access component
@@ -254,8 +256,11 @@ ob_end_clean();
 
 $xml = new DOMDocument(); 
 $xml->loadXML($xmlStr);
+$doc->xinclude();
 
-if (!$xml->schemaValidate('xsd/netfile.xsd')) { 
+$xsd =  dirname(__FILE__) . '/xsd/netfile.xsd';
+
+if (!$xml->schemaValidate($xsd)) { 
     print 'DOMDocument::schemaValidate() Generated Errors!'; 
     libxml_display_errors(); 
 }
