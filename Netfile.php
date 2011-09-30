@@ -98,15 +98,12 @@ echo '<?xml version="1.0"?>
 $SoftwareID='061G';
 $SoftwareRevisionDate='2011-08-06';
 
-// Tax reuturns data - should be supplied from DB
-// Taxpayer data:
-$taxYear = 2010;
-//...
-
 // Element list of elemts wiht values
 $elementList = array(
+        'AddressMunicipalityName',
 	'AddressPostalCode',
 	'AddressProvinceCode',
+        'AddressStreetText',
 	'AlternateAddressAuthorizationCode',
 	'BoatName',
 	'BusinessAddressStreetText',
@@ -139,7 +136,7 @@ $elementList = array(
 
 // default element values:
 foreach ($elementList as $elment) {
-	${$elment} = '';
+	${lcfirst($elment)} = '';
 }
 /* 
 // Uncomment, if you need to set other default vlues
@@ -176,7 +173,10 @@ $telephoneAreaCode='';
 $telephoneLocalNumber='';
 */
 
-$data = DataSource::getData( $userId = 2, $taxYear = $taxYear);
+$taxYear = 2010;
+$userId = 2;
+
+$data = DataSource::getData( $userId = $userId, $taxYear = $taxYear);
 
 // ReturnLines
 $returnLines = array();
@@ -209,7 +209,7 @@ foreach( $data as $row ) {
 					<tp:TaxYear><?=$taxYear?></tp:TaxYear>
 					<tp:TaxpayerBirthDate><?=$taxpayerBirthDate?></tp:TaxpayerBirthDate>
 					<tp:TaxpayerMaritalStatusCode><?=$taxpayerMaritalStatusCode?></tp:TaxpayerMaritalStatusCode>
-					<tp:SelfEmployedSpouseDeadlineIndicator><?=$SelfEmployedSpouseDeadlineIndicator?></tp:SelfEmployedSpouseDeadlineIndicator>
+					<tp:SelfEmployedSpouseDeadlineIndicator><?=$selfEmployedSpouseDeadlineIndicator?></tp:SelfEmployedSpouseDeadlineIndicator>
 				</tp:TaxpayerBasicData>
 				<tp:TaxpayerResidenceData>
 					<tp:TaxpayerYearEndResidenceProvinceCode><?=$taxpayerYearEndResidenceProvinceCode?></tp:TaxpayerYearEndResidenceProvinceCode>
@@ -256,7 +256,7 @@ ob_end_clean();
 
 $xml = new DOMDocument(); 
 $xml->loadXML($xmlStr);
-$doc->xinclude();
+$xml->xinclude();
 
 $xsd =  dirname(__FILE__) . '/xsd/netfile.xsd';
 

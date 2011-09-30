@@ -127,20 +127,21 @@ REPLACE INTO result_data VALUES
 (5274, 2, 2010, 'ON428_FL_44', '0', '', '', 0, 0.000, 0.0000, '2011-04-08 15:38:03', '2011-04-08 15:38:03'),
 (5275, 2, 2010, 'ON428_FL_45', '0', '', '', 0, 0.000, 0.0000, '2011-04-08 15:38:03', '2011-04-08 15:38:03');
 
-
 REPLACE INTO result_data
     (user_id, tax_year, line_id, form_id, line_no, line_id_global, is_optimized, optimized_value, line_value )
 VALUES
+    ( 2, 2010, 'AddressMunicipalityName', '0', '', '', 0, 0, '' ),
     ( 2, 2010, 'AddressPostalCode', '0', '', '', 0, 0, 'B0W3T0' ),
     ( 2, 2010, 'AddressProvinceCode', '0', '', '', 0, 0, 'NS' ),
-    ( 2, 2010, 'AlternateAddressAuthorizationCode', '0', '', '', 0, 0, '0' ),
+    ( 2, 2010, 'AddressStreetText', '0', '', '', 0, 0, '' ),
+    ( 2, 2010, 'AlternateAddressAuthorizationCode', '0', '', '', 0, 0, '00' ),
     ( 2, 2010, 'BoatName', '0', '', '', 0, 0, 'Colin''s Fishery' ),
     ( 2, 2010, 'BusinessAddressStreetText', '0', '', '', 0, 0, '12 GREEN ST.' ),
     ( 2, 2010, 'BusinessName', '0', '', '', 0, 0, 'HAPPY TAXES LTD.' ),
     ( 2, 2010, 'BusinessOwnershipPercent', '0', '', '', 0, 0, '8450' ),
     ( 2, 2010, 'CanadianCitizenshipIndicator', '0', '', '', 0, 0, '1' ),
     ( 2, 2010, 'CorrespondenceLanguageCode', '0', '', '', 0, 0, '2' ),
-    ( 2, 2010, 'ElectionsCanadaAuthorizationIndicator', '0', '', '', 0, 0, '2' ),
+    ( 2, 2010, 'ElectionsCanadaAuthorizationIndicator', '0', '', '', 0, 0, '02' ),
     ( 2, 2010, 'FamilyName', '0', '', '', 0, 0, 'BLACK' ),
     ( 2, 2010, 'FinalBusinessYearIndicator', '0', '', '', 0, 0, '2' ),
     ( 2, 2010, 'FiscalPeriodEndDate', '0', '', '', 0, 0, '2011-12-31' ),
@@ -156,7 +157,7 @@ VALUES
     ( 2, 2010, 'TaxpayerBirthDate', '0', '', '', 0, 0, '1966-07-12' ),
     ( 2, 2010, 'TaxpayerCurrentResidenceProvinceCode', '0', '', '', 0, 0, 'NS' ),
     ( 2, 2010, 'TaxpayerMaritalStatusCode', '0', '', '', 0, 0, '6' ),
-    ( 2, 2010, 'TaxpayerSocialInsuranceNumber', '0', '', '', 0, 0, '111111118' ),
+    ( 2, 2010, 'TaxpayerSocialInsuranceNumber', '123456789', '', '', 0, 0, '111111118' ),
     ( 2, 2010, 'TaxpayerYearEndResidenceProvinceCode', '0', '', '', 0, 0, 'NS' ),
     ( 2, 2010, 'TaxShelterNumber', '0', '', '', 0, 0, 'AA123456' ),
     ( 2, 2010, 'TaxYear', '0', '', '', 0, 0, '2010' ),
