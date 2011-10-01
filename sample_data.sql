@@ -1,25 +1,25 @@
-DROP TABLE IF EXISTS `result_data`;
+DROP TABLE IF EXISTS result_data;
 
-CREATE TABLE `result_data` (
-  `id` int(10) unsigned NOT NULL auto_increment,
-  `user_id` int(10) unsigned NOT NULL COMMENT 'references users',
-  `tax_year` smallint(4) unsigned NOT NULL,
-  `line_id` char(100) NOT NULL COMMENT 'references result_form',
-  `form_id` char(25) NOT NULL COMMENT 'Form identifier references forms table',
-  `line_no` char(25) NOT NULL COMMENT 'This should be line no. on the form.',
-  `line_id_global` char(25) NOT NULL COMMENT 'This indicates global line no. which is different than the line no. on the form.',
-  `is_optimized` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 means optimized and 0 means not optimized.',
-  `optimized_value` decimal(12,3) NULL COMMENT 'If Is_optimized is 1, then this should have some value which can be different than calculated value',
-  `line_value` varchar(1000) NOT NULL, -- decimal(15,4) NOT NULL,
-  `date_created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `date_updated` TIMESTAMP NULL DEFAULT NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `result_form_id` (`line_id`,`user_id`,`tax_year`)
+CREATE TABLE result_data (
+  id int(10) unsigned NOT NULL auto_increment,
+  user_id int(10) unsigned NOT NULL COMMENT 'references users',
+  tax_year smallint(4) unsigned NOT NULL,
+  line_id char(100) NOT NULL COMMENT 'references result_form',
+  form_id char(25) NOT NULL COMMENT 'Form identifier references forms table',
+  line_no char(25) NOT NULL COMMENT 'This should be line no. on the form.',
+  line_id_global char(25) NOT NULL COMMENT 'This indicates global line no. which is different than the line no. on the form.',
+  is_optimized tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 means optimized and 0 means not optimized.',
+  optimized_value decimal(12,3) NULL COMMENT 'If Is_optimized is 1, then this should have some value which can be different than calculated value',
+  line_value varchar(1000) NOT NULL, -- decimal(15,4) NOT NULL,
+  date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  date_updated TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY result_form_id (line_id,user_id,tax_year)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=83597 ;
 
 
 --
--- Dumping data for table `result_data`
+-- Dumping data for table result_data
 --
 
 TRUNCATE TABLE result_data;

@@ -1,40 +1,9 @@
 <?php
 
-function libxml_display_error($error) 
-{ 
-    $return = "<br/>\n"; 
-    switch ($error->level) { 
-        case LIBXML_ERR_WARNING: 
-            $return .= "<b>Warning $error->code</b>: "; 
-            break; 
-        case LIBXML_ERR_ERROR: 
-            $return .= "<b>Error $error->code</b>: "; 
-            break; 
-        case LIBXML_ERR_FATAL: 
-            $return .= "<b>Fatal Error $error->code</b>: "; 
-            break; 
-    } 
-    $return .= trim($error->message); 
-    if ($error->file) { 
-        $return .=    " in <b>$error->file</b>"; 
-    } 
-    $return .= " on line <b>$error->line</b>\n"; 
-
-    return $return; 
-} 
-
-function libxml_display_errors() { 
-    $errors = libxml_get_errors(); 
-    foreach ($errors as $error) { 
-        print libxml_display_error($error); 
-    } 
-    libxml_clear_errors(); 
-} 
-
-// Enable user error handling 
+// Enable user error handling:
 libxml_use_internal_errors(true);
+// Enable XML/XSD includes:
 libxml_disable_entity_loader( false);
-
 
 /**
  * Data access component
@@ -47,26 +16,26 @@ class DataSource {
 
 	/**
 	 *
-	 * @return type 
+	 * @return type
 	 */
 	function __construct() {
 		return;
 	}
-	
+
 	/**
 	 *
 	 * @param int $userId User ID
 	 * @param int $taxYear Tax Year
-	 * @return array() 
+	 * @return array()
 	 */
 	static function getData(
 			$userId = 2,
 			$taxYear = 2010) {
 
 		try {
-			$dbh = new PDO( 
-					static::$_connectionString, 
-					static::$_user, 
+			$dbh = new PDO(
+					static::$_connectionString,
+					static::$_user,
 					static::$_pass );
 			$stmt = $dbh->prepare(
 					"SELECT
@@ -88,121 +57,161 @@ class DataSource {
 
 }
 
+class Netfile{
 
-// TODO: Encapsulate into a class
+	/**
+	 * Software ID (should match the ID specified by the schema)
+	 * @var string
+	 */
+	const SoftwareID='061G';
+	/**
+	 * Software Revision Date (should match the ID specified by the schema)
+	 * @var string
+	 */
+	const SoftwareRevisionDate='2011-08-06';
 
-ob_start();
-// to run from CLI: php -f Netfile.php | more
-echo '<?xml version="1.0"?>
-';
-$SoftwareID='061G';
-$SoftwareRevisionDate='2011-08-06';
+	/**
+	 * @var arrary(string) Element list of elemts wiht values
+	 */
+	static private $_elementList = array(
+		'AddressMunicipalityName',
+		'AddressPostalCode',
+		'AddressProvinceCode',
+		'AddressStreetText',
+		'AlternateAddressAuthorizationCode',
+		'BoatName',
+		'BusinessAddressStreetText',
+		'BusinessName',
+		'BusinessOwnershipPercent',
+		'CanadianCitizenshipIndicator',
+		'CorrespondenceLanguageCode',
+		'ElectionsCanadaAuthorizationIndicator',
+		'FamilyName',
+		'FinalBusinessYearIndicator',
+		'FiscalPeriodEndDate',
+		'FiscalPeriodStartDate',
+		'GivenName',
+		'GSTHSTCreditApplicationIndicator',
+		'NAICSCode',
+		'PartnerBusinessOwnershipPercent',
+		'PartnerPIN',
+		'PartnershipNumber',
+		'SelectedFinancialDataRecordCount',
+		'SelfEmployedSpouseDeadlineIndicator',
+		'TaxpayerBirthDate',
+		'TaxpayerCurrentResidenceProvinceCode',
+		'TaxpayerMaritalStatusCode',
+		'TaxpayerSocialInsuranceNumber',
+		'TaxpayerYearEndResidenceProvinceCode',
+		'TaxShelterNumber',
+		'TelephoneAreaCode',
+		'TelephoneLocalNumber' );
 
-// Element list of elemts wiht values
-$elementList = array(
-        'AddressMunicipalityName',
-	'AddressPostalCode',
-	'AddressProvinceCode',
-        'AddressStreetText',
-	'AlternateAddressAuthorizationCode',
-	'BoatName',
-	'BusinessAddressStreetText',
-	'BusinessName',
-	'BusinessOwnershipPercent',
-	'CanadianCitizenshipIndicator',
-	'CorrespondenceLanguageCode',
-	'ElectionsCanadaAuthorizationIndicator',
-	'FamilyName',
-	'FinalBusinessYearIndicator',
-	'FiscalPeriodEndDate',
-	'FiscalPeriodStartDate',
-	'GivenName',
-	'GSTHSTCreditApplicationIndicator',
-	'NAICSCode',
-	'PartnerBusinessOwnershipPercent',
-	'PartnerPIN',
-	'PartnershipNumber',
-	'SelectedFinancialDataRecordCount',
-	'SelfEmployedSpouseDeadlineIndicator',
-	'TaxpayerBirthDate',
-	'TaxpayerCurrentResidenceProvinceCode',
-	'TaxpayerMaritalStatusCode',
-	'TaxpayerSocialInsuranceNumber',
-	'TaxpayerYearEndResidenceProvinceCode',
-	'TaxShelterNumber',
-	'TaxYear',
-	'TelephoneAreaCode',
-	'TelephoneLocalNumber' );
+	/**
+	 * @var boolean XML vaidation indicato
+	 */
+	private $_isValid = TRUE;
 
-// default element values:
-foreach ($elementList as $elment) {
-	${lcfirst($elment)} = '';
-}
-/* 
-// Uncomment, if you need to set other default vlues
-$addressPostalCode='';
-$addressProvinceCode='';
-$alternateAddressAuthorizationCode='';
-$boatName='';
-$businessAddressStreetText='';
-$businessName='';
-$businessOwnershipPercent='';
-$canadianCitizenshipIndicator='';
-$correspondenceLanguageCode='';
-$electionsCanadaAuthorizationIndicator='';
-$familyName='';
-$finalBusinessYearIndicator='';
-$fiscalPeriodEndDate='';
-$fiscalPeriodStartDate='';
-$givenName='';
-$gSTHSTCreditApplicationIndicator='';
-$nAICSCode='';
-$partnerBusinessOwnershipPercent='';
-$partnerPIN='';
-$partnershipNumber='';
-$selectedFinancialDataRecordCount='';
-$selfEmployedSpouseDeadlineIndicator='';
-$taxpayerBirthDate='';
-$taxpayerCurrentResidenceProvinceCode='';
-$taxpayerMaritalStatusCode='';
-$taxpayerSocialInsuranceNumber='';
-$taxpayerYearEndResidenceProvinceCode='';
-$taxShelterNumber='';
-$taxYear='';
-$telephoneAreaCode='';
-$telephoneLocalNumber='';
-*/
+	/**
+	 * @var array() Validation error messages
+	 */
+	private $_errors = NULL;
 
-$taxYear = 2010;
-$userId = 2;
+	/** @var DOMDocument XML DOM representation */
+	private $_xml = NULL;
 
-$data = DataSource::getData( $userId = $userId, $taxYear = $taxYear);
+	/**
+	 * @return DOMDocument Validated XML document
+	 */
+	public function getDoc() {
+		return $this->_xml;
+	}
 
-// ReturnLines
-$returnLines = array();
+	/**
+	 * @return string serialized XML document
+	 */
+	public function getXML() {
+		return $this->_xml->saveXML();
+	}
 
-foreach( $data as $row ) {
-	$lineId = $row->line_id;
-	if (	$row->line_type == 'TRC_L' 
-			&& $row->field_code >= 100
-			&& $row->field_code <= 8000)
-		$returnLines[] = (object) array( 'code'=>$row->field_code, 'value'=>$row->line_value);
-	elseif ( in_array ( $lineId, $elementList ) )
-		${lcfirst($lineId)} = $row->line_value;
-}
+	/**
+	 * @param int $userId User ID
+	 * @param int $taxYear Tax Year
+	 * @return DOMDocument Validated XML document
+	 */
+	public function createT1NetfileDoc(
+		$userId = 2,
+		$taxYear = 2010) {
 
-?>
-<net:Netfile 
-	xmlns:comm="http://www.cra-arc.gc.ca/xmlns/comm/2012/1-0-0" 
-	xmlns:net="http://www.cra-arc.gc.ca/xmlns/netfile/2012/1-0-0" 
-	xmlns:sdt="http://www.cra-arc.gc.ca/xmlns/sdt/2-0-0" 
-	xmlns:sfd="http://www.cra-arc.gc.ca/xmlns/sfd/2012/1-0-0" 
-	xmlns:t1="http://www.cra-arc.gc.ca/xmlns/t1/2012/1-0-0" 
+		// default element values: ''
+		foreach ( static::$_elementList as $elment) {
+			${lcfirst($elment)} = '';
+		}
+
+		// Uncomment, if you need to set other default vlues
+		//$addressPostalCode='';
+		//$addressProvinceCode='';
+		//$alternateAddressAuthorizationCode='';
+		//$boatName='';
+		//$businessAddressStreetText='';
+		//$businessName='';
+		//$businessOwnershipPercent='';
+		//$canadianCitizenshipIndicator='';
+		//$correspondenceLanguageCode='';
+		//$electionsCanadaAuthorizationIndicator='';
+		//$familyName='';
+		//$finalBusinessYearIndicator='';
+		//$fiscalPeriodEndDate='';
+		//$fiscalPeriodStartDate='';
+		//$givenName='';
+		//$gSTHSTCreditApplicationIndicator='';
+		//$nAICSCode='';
+		//$partnerBusinessOwnershipPercent='';
+		//$partnerPIN='';
+		//$partnershipNumber='';
+		//$selectedFinancialDataRecordCount='';
+		//$selfEmployedSpouseDeadlineIndicator='';
+		//$taxpayerBirthDate='';
+		//$taxpayerCurrentResidenceProvinceCode='';
+		//$taxpayerMaritalStatusCode='';
+		//$taxpayerSocialInsuranceNumber='';
+		//$taxpayerYearEndResidenceProvinceCode='';
+		//$taxShelterNumber='';
+		//$taxYear='';
+		//$telephoneAreaCode='';
+		//$telephoneLocalNumber='';
+
+		$data = DataSource::getData( $userId = $userId, $taxYear = $taxYear);
+
+		// Return Lines
+		$returnLines = array();
+
+		foreach( $data as $row ) {
+			$lineId = $row->line_id;
+			if (	$row->line_type == 'TRC_L'
+					&& $row->field_code >= 100
+					&& $row->field_code <= 8000)
+				$returnLines[] = (object) array( 'code'=>$row->field_code, 'value'=>$row->line_value);
+			elseif ( in_array ( $lineId, static::$_elementList ) )
+				${lcfirst($lineId)} = $row->line_value;
+		}
+
+		// generating teh document:
+		ob_start();
+		echo "<?xml version=\"1.0\"?>\n";
+
+		?>
+<net:Netfile
+	xmlns:comm="http://www.cra-arc.gc.ca/xmlns/comm/2012/1-0-0"
+	xmlns:net="http://www.cra-arc.gc.ca/xmlns/netfile/2012/1-0-0"
+	xmlns:sdt="http://www.cra-arc.gc.ca/xmlns/sdt/2-0-0"
+	xmlns:sfd="http://www.cra-arc.gc.ca/xmlns/sfd/2012/1-0-0"
+	xmlns:t1="http://www.cra-arc.gc.ca/xmlns/t1/2012/1-0-0"
 	xmlns:tp="http://www.cra-arc.gc.ca/xmlns/tp/2012/1-0-0">
 	<net:T1Netfile>
 		<t1:T1Return>
-			<comm:SoftwareID><?=$SoftwareID?></comm:SoftwareID>
-			<comm:SoftwareRevisionDate><?=$SoftwareRevisionDate?></comm:SoftwareRevisionDate>
+			<comm:SoftwareID><?=self::SoftwareID?></comm:SoftwareID>
+			<comm:SoftwareRevisionDate><?=self::SoftwareRevisionDate?></comm:SoftwareRevisionDate>
 			<t1:TaxpayerData>
 				<tp:TaxpayerBasicData>
 					<tp:TaxpayerSocialInsuranceNumber><?=$taxpayerSocialInsuranceNumber;?></tp:TaxpayerSocialInsuranceNumber>
@@ -251,18 +260,31 @@ foreach( $data as $row ) {
 	</net:T1Netfile>
 </net:Netfile>
 <?php
-$xmlStr=ob_get_contents();
-ob_end_clean();
+		$xmlStr=ob_get_contents();
+		ob_end_clean();
 
-$xml = new DOMDocument(); 
-$xml->loadXML($xmlStr);
-$xml->xinclude();
+		$this->_xml = new DOMDocument();
+		$this->_xml->loadXML($xmlStr);
+		$this->_xml->xinclude();
 
-$xsd =  dirname(__FILE__) . '/xsd/netfile.xsd';
+		$this->_isValid = $this->_xml->schemaValidate( dirname(__FILE__) . '/xsd/netfile.xsd' );
+		$this->_errors = $this->_isValid ? NULL : libxml_get_errors();
+		libxml_clear_errors();
+		return $this->_xml;
 
-if (!$xml->schemaValidate($xsd)) { 
-    print 'DOMDocument::schemaValidate() Generated Errors!'; 
-    libxml_display_errors(); 
+	}
+
+	/**
+	 * Property getter
+	 * @param string $variable
+	 * @return mixed
+	 */
+	public function __get($variable)
+	{
+		if ($variable == 'isValid') return $this->_isValid;
+		else if ($variable == 'errors') return $this->_errors;
+		else if ($variable == 'XML') return $this->getXML();
+		else if ($variable == 'Doc') return $this->getDoc();
+		return $this->{$variable};
+	}
 }
-
-echo $xml->saveXML();
