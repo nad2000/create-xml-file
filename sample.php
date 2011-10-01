@@ -50,7 +50,7 @@ $nefile = new Netfile();
 $doc = $nefile->createT1NetfileDoc( 2, 2010);
 
 // 3. Check validation status and print out error messages
-if (!$nefile->isValid) display_error ($nefile->errors);
+if (!$nefile->isValid) display_errors ($nefile->errors);
 
 // 4. Optionally retrieve serialized XML document representation
 $xml = $nefile->XML;
