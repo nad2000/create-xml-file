@@ -5,57 +5,7 @@ libxml_use_internal_errors(true);
 // Enable XML/XSD includes:
 libxml_disable_entity_loader( false);
 
-/**
- * Data access component
- */
-class DataSource {
-
-	static private $_user = 'root';
-	static private $_pass = NULL;
-	static private $_connectionString = 'mysql:host=localhost;dbname=test';
-
-	/**
-	 *
-	 * @return type
-	 */
-	function __construct() {
-		return;
-	}
-
-	/**
-	 *
-	 * @param int $userId User ID
-	 * @param int $taxYear Tax Year
-	 * @return array()
-	 */
-	static function getData(
-			$userId = 2,
-			$taxYear = 2010) {
-
-		try {
-			$dbh = new PDO(
-					static::$_connectionString,
-					static::$_user,
-					static::$_pass );
-			$stmt = $dbh->prepare(
-					"SELECT
-						r.*,
-						SUBSTRING_INDEX(line_id,'_',2) AS line_type, -- Line ID prefix
-						SUBSTRING_INDEX(line_id,'_',-1) AS field_code -- Field code
-					FROM result_data AS r
-					WHERE user_id = ? AND tax_year = ?");
-			$stmt->execute( array( $userId, $taxYear ));
-			$rows = $stmt->fetchAll(PDO::FETCH_CLASS);
-			$dbh = null;
-		} catch (PDOException $e) {
-			print "Error!: " . $e->getMessage() . "<br/>";
-			die();
-		}
-
-		return $rows;
-	}
-
-}
+require_once 'DataSource.php';
 
 class Netfile{
 
@@ -110,9 +60,9 @@ class Netfile{
 		'YukonFirstNationsSettlementNumber' );
 
 	/**
-	 * @var arrary(string) SDF element map of elemts wiht field type codes
+	 * @var arrary(string) SFD element map of elemts wiht field type codes
 	 */
-	static private $_SDFElementMap = array(
+	static private $_SFDElementMap = array(
 		'ASAIPFD'	=>	'AgriStabilityAgriInvestProgramFarmingData',
 		'ASAIPHD'	=>	'AgriStabilityAgriInvestProgramHarmonizedData',
 		'BAD'	=>	'BusinessActivityData',
@@ -123,30 +73,30 @@ class Netfile{
 		'PAD'	=>	'ProfessionalActivityData',
 		'RERD'	=>	'RealEstateRentalData'
 	);
-	
+
 	/**
-	 * @var arrary(string) SDF Valid Field Code
+	 * @var arrary(string) SFD Valid Field Code
 	 */
-	static private $_validSDFcodes = array(
+	static private $_validSFDcodes = array(
 		'RealEstateRentalData'	=>	array(
-			8141, 8230, 8299, 8521,8690, 8710, 8810, 8860, 8871, 8960, 9060, 9180, 9200, 9220, 9281, 9270, 9949, 
+			8141, 8230, 8299, 8521,8690, 8710, 8810, 8860, 8871, 8960, 9060, 9180, 9200, 9220, 9281, 9270, 9949,
 			9369, 9945, 9947, 9948, 9936, 9974, 9943, 9946,9925, 9926, 9927, 9928, 9923, 9924),
 		'BusinessActivityData'	=>	array(
-			8000, 8290, 8230, 8299, 8300, 8320, 8340, 8360, 8450, 8500, 8518, 8519, 8521, 8523, 8590, 8710, 8760, 
-			8810, 8811, 8860, 8871, 8910, 8960, 9060, 9180, 9200, 9220, 9224, 9275, 9281, 9935, 9936, 9270, 9368, 
+			8000, 8290, 8230, 8299, 8300, 8320, 8340, 8360, 8450, 8500, 8518, 8519, 8521, 8523, 8590, 8710, 8760,
+			8810, 8811, 8860, 8871, 8910, 8960, 9060, 9180, 9200, 9220, 9224, 9275, 9281, 9935, 9936, 9270, 9368,
 			9369, 9974,9943, 9945, 9946, 9931, 9932, 9933, 9925, 9927, 9923, 9924, 9926, 9928),
 		'ProfessionalActivityData'	=>	array(
-			8000, 8290, 8230, 8299, 8521, 8523, 8590, 8690, 8710, 8760, 8810, 8811, 8860, 8871, 8910, 8960, 9060, 
-			9180, 9200, 9220, 9224, 9275, 9281, 9935, 9936, 9270, 9368, 9369, 9974, 9943, 9945, 9946, 9931, 9932, 
+			8000, 8290, 8230, 8299, 8521, 8523, 8590, 8690, 8710, 8760, 8810, 8811, 8860, 8871, 8910, 8960, 9060,
+			9180, 9200, 9220, 9224, 9275, 9281, 9935, 9936, 9270, 9368, 9369, 9974, 9943, 9945, 9946, 9931, 9932,
 			9933, 9923, 9924, 9925, 9926, 9927, 9928),
 		'FishingActivityData'	=>	array(
-			9600, 8299, 9138, 9062, 9224, 9136, 8690, 8710, 8523, 8760, 9281, 8810, 9137, 8860, 9060, 8963, 9270, 
+			9600, 8299, 9138, 9062, 9224, 9136, 8690, 8710, 8523, 8760, 9281, 8810, 9137, 8860, 9060, 8963, 9270,
 			9935, 9936, 9369, 9974, 9943, 9945, 9946, 9931, 9932, 9933, 9925, 9926, 9927, 9923, 9924, 9928),
 		'FarmingActivityData'	=>	array(
-			9370, 9371, 9372, 9373, 9374, 9375, 9376, 9377, 9378, 9420, 9421, 9422, 9423, 9424, 9425, 9426, 9470, 
-			9471, 9472, 9473, 9474, 9476, 9477, 9520, 9541, 9542, 9540, 9570, 9601, 9604, 9605, 9600, 9659, 9661, 
-			9662, 9663, 9664, 9711, 9712, 9713, 9760, 9764, 9795, 9796, 9797, 9798, 9799, 9802, 9803, 9804, 9805, 
-			9808, 9809, 9810, 9811, 9814, 9819, 9820, 9937, 9938, 9790, 9935, 9936, 9898, 9899, 9941, 9942, 9974, 
+			9370, 9371, 9372, 9373, 9374, 9375, 9376, 9377, 9378, 9420, 9421, 9422, 9423, 9424, 9425, 9426, 9470,
+			9471, 9472, 9473, 9474, 9476, 9477, 9520, 9541, 9542, 9540, 9570, 9601, 9604, 9605, 9600, 9659, 9661,
+			9662, 9663, 9664, 9711, 9712, 9713, 9760, 9764, 9795, 9796, 9797, 9798, 9799, 9802, 9803, 9804, 9805,
+			9808, 9809, 9810, 9811, 9814, 9819, 9820, 9937, 9938, 9790, 9935, 9936, 9898, 9899, 9941, 9942, 9974,
 			9943, 9945, 9946, 9923, 9924, 9925, 9926, 9927, 9928, 9929, 9930, 9931, 9932, 9933),
 		'EmploymentExpenseData'	=>	array(
 			8862, 8520, 9281, 8523, 9200, 8910, 8810, 9270, 1770, 9131, 1776, 1777, 9973, 9945, 9368),
@@ -251,7 +201,6 @@ EOS;
 		// Return Lines
 		$returnLines = array();
 
-		$SDFRecordCount = 0;
 		foreach( $data as $row ) {
 			$lineId = $row->line_id;
 			if (	$row->line_type == 'TRC_L'
@@ -259,12 +208,12 @@ EOS;
 					&& $row->field_code >= 100
 					&& $row->field_code <= 8000)
 			{
-				$returnLines[] = (object) array( 
+				$returnLines[] = (object) array(
 					'type'=>$row->line_type,
-					'code'=> intval($row->field_code), 
+					'code'=> intval($row->field_code),
 					'value'=>$row->line_value );
-				/*if ( array_key_exists($row->line_type, static::$_SDFElementMap))
-						${lcfirst( static::$_SDFElementMap[$row->line_type])} = TRUE;
+				/*if ( array_key_exists($row->line_type, static::$_SFDElementMap))
+						${lcfirst( static::$_SFDElementMap[$row->line_type])} = TRUE;
 						$agriStabilityAgriInvestProgramFarmingData;
 						$agriStabilityAgriInvestProgramHarmonizedData;
 						$businessActivityData;
@@ -277,12 +226,10 @@ EOS;
 			}
 			elseif ( in_array ( $lineId, static::$_elementList ) )
 				${lcfirst($lineId)} = $row->line_value;
-			elseif ( in_array ( $lineId, static::$_SDFElementMap ) && $row->line_value == '1' ) {
-				${lcfirst($lineId)} = TRUE;
-				$SDFRecordCount++;
-			}
 		}
 
+		$sfdData = DataSource::getSFDData( $userId = $userId, $taxYear = $taxYear);
+		$SFDRecordCount = count( $sfdData);
 		// generating teh document:
 		ob_start();
 		echo "<?xml version=\"1.0\"?>\n";
@@ -346,125 +293,14 @@ EOS;
 				<t1:GSTHSTCreditApplicationIndicator><?php echo $gSTHSTCreditApplicationIndicator;?></t1:GSTHSTCreditApplicationIndicator>
 			</t1:RelatedProgramData>
 			<?php $this->createReturnLines($returnLines); ?>
-			<?php if ($SDFRecordCount > 0): ?>
-			<t1:SelectedFinancialDataRecordCount><?php printf( "%02d", $SDFRecordCount);  ?></t1:SelectedFinancialDataRecordCount>
-			<?php if (!empty($realEstateRentalData)): ?>
-			<sfd:SelectedFinancialData>
-				<sfd:RealEstateRentalData>
-					<sfd:BusinessNumber>123456789RT1234</sfd:BusinessNumber>
-					<sfd:NAICSCode>531111</sfd:NAICSCode>
-					<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
-					<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
-					<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
-					<sfd:BusinessOwnershipPercent>8450</sfd:BusinessOwnershipPercent>
-					<sfd:FinalBusinessYearIndicator>1</sfd:FinalBusinessYearIndicator>
-					<sfd:PartnerCoOwnerData>
-						<sfd:PartnerName>
-							<comm:GivenName>John</comm:GivenName>
-							<comm:FamilyName>Doe</comm:FamilyName>
-						</sfd:PartnerName>
-						<sfd:PartnerPIN>0</sfd:PartnerPIN>
-						<sfd:PartnerBusinessOwnershipPercent>155000</sfd:PartnerBusinessOwnershipPercent>
-					</sfd:PartnerCoOwnerData>
-					<?php $this->createReturnLines($returnLines, static::$_validSDFcodes['RealEstateRentalData']); ?>
-				</sfd:RealEstateRentalData>
-			</sfd:SelectedFinancialData>
-			<?php endif; ?>
-			<?php if (!empty($businessActivityData)): ?>
-			<sfd:SelectedFinancialData>
-				<sfd:BusinessActivityData>
-					<sfd:BusinessNumber>334455667AA8990</sfd:BusinessNumber>
-					<sfd:NAICSCode>123456</sfd:NAICSCode>
-					<sfd:BusinessName>HAPPY TAXES LTD.</sfd:BusinessName>
-					<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
-					<sfd:TaxShelterNumber>AA123456</sfd:TaxShelterNumber>
-					<sfd:BusinessAddress>
-						<comm:BusinessAddressStreetText>12 GREEN ST.</comm:BusinessAddressStreetText>
-						<comm:AddressPostalCode>K1B2F9</comm:AddressPostalCode>
-					</sfd:BusinessAddress>
-					<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
-					<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
-					<sfd:BusinessOwnershipPercent>8500</sfd:BusinessOwnershipPercent>
-					<sfd:FinalBusinessYearIndicator>1</sfd:FinalBusinessYearIndicator>
-					<sfd:PartnerCoOwnerData>
-						<sfd:PartnerName>
-							<comm:GivenName>MAC</comm:GivenName>
-							<comm:FamilyName>BLACK</comm:FamilyName>
-						</sfd:PartnerName>
-						<sfd:PartnerPIN>00000000</sfd:PartnerPIN>
-						<sfd:PartnerBusinessOwnershipPercent>150000</sfd:PartnerBusinessOwnershipPercent>
-					</sfd:PartnerCoOwnerData>
-					<?php $this->createReturnLines($returnLines, static::$_validSDFcodes['BusinessActivityData']); ?>
-				</sfd:BusinessActivityData>
-			</sfd:SelectedFinancialData>
-			<?php endif; ?>
-			<?php if (!empty($professionalActivityData)): ?>
-			<sfd:SelectedFinancialData>
-				<sfd:ProfessionalActivityData>
-					<sfd:BusinessNumber>123456789AA2345</sfd:BusinessNumber>
-					<sfd:NAICSCode>541110</sfd:NAICSCode>
-					<sfd:BusinessName>James Publishing</sfd:BusinessName>
-					<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
-					<sfd:TaxShelterNumber>AB123456</sfd:TaxShelterNumber>
-					<sfd:BusinessAddress>
-						<comm:BusinessAddressStreetText>20 Spicer Street</comm:BusinessAddressStreetText>
-						<comm:AddressPostalCode>R2Y1C4</comm:AddressPostalCode>
-					</sfd:BusinessAddress>
-					<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
-					<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
-					<sfd:BusinessOwnershipPercent>0000</sfd:BusinessOwnershipPercent>
-					<sfd:FinalBusinessYearIndicator>2</sfd:FinalBusinessYearIndicator>
-					<sfd:PartnerCoOwnerData>
-						<sfd:PartnerName>
-							<comm:GivenName></comm:GivenName>
-							<comm:FamilyName></comm:FamilyName>
-						</sfd:PartnerName>
-						<sfd:PartnerPIN>00000000</sfd:PartnerPIN>
-						<sfd:PartnerBusinessOwnershipPercent>0</sfd:PartnerBusinessOwnershipPercent>
-					</sfd:PartnerCoOwnerData>
-					<?php $this->createReturnLines($returnLines, static::$_validSDFcodes['ProfessionalActivityData']); ?>
-				</sfd:ProfessionalActivityData>	
-			</sfd:SelectedFinancialData>
-			<?php endif; ?>
-			<?php if (!empty($fishingActivityData)): ?>
-			<sfd:SelectedFinancialData>
-				<sfd:FishingActivityData>
-					<sfd:BusinessNumber>123456789AA2345</sfd:BusinessNumber>
-					<sfd:NAICSCode>114133</sfd:NAICSCode>
-					<sfd:BoatName>Colin's Fishery</sfd:BoatName>
-					<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
-					<sfd:TaxShelterNumber>AA123456</sfd:TaxShelterNumber>
-					<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
-					<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
-					<sfd:BusinessOwnershipPercent>0000</sfd:BusinessOwnershipPercent>
-					<sfd:FinalBusinessYearIndicator>1</sfd:FinalBusinessYearIndicator>
-					<sfd:PartnerCoOwnerData>
-						<sfd:PartnerName>
-							<comm:GivenName></comm:GivenName>
-							<comm:FamilyName></comm:FamilyName>
-						</sfd:PartnerName>
-						<sfd:PartnerPIN>00000000</sfd:PartnerPIN>
-						<sfd:PartnerBusinessOwnershipPercent>0</sfd:PartnerBusinessOwnershipPercent>
-					</sfd:PartnerCoOwnerData>
-					<?php $this->createReturnLines($returnLines, static::$_validSDFcodes['FishingActivityData']); ?>
-				</sfd:FishingActivityData>
-			</sfd:SelectedFinancialData>
-			<?php endif; ?>
-			<?php if (!empty($employmentExpenseData)): ?>
-			<sfd:SelectedFinancialData>
-				<sfd:EmploymentExpenseData>
-					<?php $this->createReturnLines($returnLines, static::$_validSDFcodes['EmploymentExpenseData']); ?>
-				</sfd:EmploymentExpenseData>
-			</sfd:SelectedFinancialData>
-			<?php endif; ?>
-			<?php if (!empty($mealLodgingExpenseData)): ?>
-			<sfd:SelectedFinancialData>
-				<sfd:MealLodgingExpenseData>
-					<?php $this->createReturnLines($returnLines, static::$_validSDFcodes['MealLodgingExpenseData']); ?>
-				</sfd:MealLodgingExpenseData>
-			</sfd:SelectedFinancialData>
-			<?php endif; ?>
-			<?php endif; // $SDFRecordCount > 0  ?>
+			<?php if ($SFDRecordCount > 0): ?>
+			<t1:SelectedFinancialDataRecordCount><?php printf( "%02d", $SFDRecordCount);  ?></t1:SelectedFinancialDataRecordCount>
+			<?php foreach ($sfdData as $sfdRow): ?>
+				<sfd:SelectedFinancialData>
+					<?php $this->createSFDElement($sfdRow, $returnLines); ?>
+				</sfd:SelectedFinancialData>
+			<?php endforeach; ?>
+			<?php endif; // $SFDRecordCount > 0  ?>
 		</t1:T1Return>
 	</net:T1Netfile>
 </net:Netfile>
@@ -481,6 +317,124 @@ EOS;
 		libxml_clear_errors();
 		return $this->_xml;
 
+	}
+
+	/**
+	 * Renders SFD record
+	 * @param object  $sfdRow SFD entry DB row
+	 * @param array() $returnLines Return lines
+	 * @param array() $validCodes  Valid codes
+	 */
+	private function createSFDElement( $sfdRow, $returnLines, $validCodes = NULL)
+	{
+		if ( $sfdRow->Data_Type=='REAL' ): ?>
+			<sfd:RealEstateRentalData>
+				<sfd:BusinessNumber>123456789RT1234</sfd:BusinessNumber>
+				<sfd:NAICSCode>531111</sfd:NAICSCode>
+				<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
+				<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
+				<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
+				<sfd:BusinessOwnershipPercent>8450</sfd:BusinessOwnershipPercent>
+				<sfd:FinalBusinessYearIndicator>1</sfd:FinalBusinessYearIndicator>
+				<sfd:PartnerCoOwnerData>
+					<sfd:PartnerName>
+						<comm:GivenName>John</comm:GivenName>
+						<comm:FamilyName>Doe</comm:FamilyName>
+					</sfd:PartnerName>
+					<sfd:PartnerPIN>0</sfd:PartnerPIN>
+					<sfd:PartnerBusinessOwnershipPercent>155000</sfd:PartnerBusinessOwnershipPercent>
+				</sfd:PartnerCoOwnerData>
+				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['RealEstateRentalData']); ?>
+			</sfd:RealEstateRentalData>
+		<?php endif;
+		if ($sfdRow->Data_Type=='BUSINESS'): ?>
+		<sfd:SelectedFinancialData>
+			<sfd:BusinessActivityData>
+				<sfd:BusinessNumber><?php echo $sfdRow->BusinessNumber; ?></sfd:BusinessNumber>
+				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE; ?></sfd:NAICSCode>
+				<sfd:BusinessName><?php echo $sfdRow->BusinessName; ?></sfd:BusinessName>
+				<sfd:PartnershipNumber><?php echo $sfdRow->PartnershipNumber; ?></sfd:PartnershipNumber>
+				<sfd:TaxShelterNumber><?php echo $sfdRow->TaxShelterNumber; ?></sfd:TaxShelterNumber>
+				<sfd:BusinessAddress>
+					<comm:BusinessAddressStreetText><?php echo $sfdRow->BusinessAddressStreetText; ?></comm:BusinessAddressStreetText>
+					<comm:AddressPostalCode><?php echo $sfdRow->AddressPostalCode; ?></comm:AddressPostalCode>
+				</sfd:BusinessAddress>
+				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
+				<sfd:FiscalPeriodEndDate><?php echo $sfdRow->FiscalPeriodeEndDate;?></sfd:FiscalPeriodEndDate>
+				<sfd:BusinessOwnershipPercent><?php echo $sfdRow->BusinessOwnershipPercent;?></sfd:BusinessOwnershipPercent>
+				<sfd:FinalBusinessYearIndicator><?php echo $sfdRow->FinalBusinessYearIndicator;?></sfd:FinalBusinessYearIndicator>
+				<sfd:PartnerCoOwnerData>
+					<sfd:PartnerName>
+						<comm:GivenName>MAC</comm:GivenName>
+						<comm:FamilyName>BLACK</comm:FamilyName>
+					</sfd:PartnerName>
+					<sfd:PartnerPIN>00000000</sfd:PartnerPIN>
+					<sfd:PartnerBusinessOwnershipPercent>150000</sfd:PartnerBusinessOwnershipPercent>
+				</sfd:PartnerCoOwnerData>
+				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['BusinessActivityData']); ?>
+			</sfd:BusinessActivityData>
+		</sfd:SelectedFinancialData>
+		<?php endif;
+		if ($sfdRow->Data_Type=='PROFESSIONAL'): ?>
+			<sfd:ProfessionalActivityData>
+				<sfd:BusinessNumber>123456789AA2345</sfd:BusinessNumber>
+				<sfd:NAICSCode>541110</sfd:NAICSCode>
+				<sfd:BusinessName>James Publishing</sfd:BusinessName>
+				<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
+				<sfd:TaxShelterNumber>AB123456</sfd:TaxShelterNumber>
+				<sfd:BusinessAddress>
+					<comm:BusinessAddressStreetText>20 Spicer Street</comm:BusinessAddressStreetText>
+					<comm:AddressPostalCode>R2Y1C4</comm:AddressPostalCode>
+				</sfd:BusinessAddress>
+				<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
+				<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
+				<sfd:BusinessOwnershipPercent>0000</sfd:BusinessOwnershipPercent>
+				<sfd:FinalBusinessYearIndicator>2</sfd:FinalBusinessYearIndicator>
+				<sfd:PartnerCoOwnerData>
+					<sfd:PartnerName>
+						<comm:GivenName></comm:GivenName>
+						<comm:FamilyName></comm:FamilyName>
+					</sfd:PartnerName>
+					<sfd:PartnerPIN>00000000</sfd:PartnerPIN>
+					<sfd:PartnerBusinessOwnershipPercent>0</sfd:PartnerBusinessOwnershipPercent>
+				</sfd:PartnerCoOwnerData>
+				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['ProfessionalActivityData']); ?>
+			</sfd:ProfessionalActivityData>
+		<?php endif;
+		if ($sfdRow->Data_Type=='FISHING'): ?>
+			<sfd:FishingActivityData>
+				<sfd:BusinessNumber>123456789AA2345</sfd:BusinessNumber>
+				<sfd:NAICSCode>114133</sfd:NAICSCode>
+				<sfd:BoatName>Colin's Fishery</sfd:BoatName>
+				<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
+				<sfd:TaxShelterNumber>AA123456</sfd:TaxShelterNumber>
+				<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
+				<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
+				<sfd:BusinessOwnershipPercent>0000</sfd:BusinessOwnershipPercent>
+				<sfd:FinalBusinessYearIndicator>1</sfd:FinalBusinessYearIndicator>
+				<sfd:PartnerCoOwnerData>
+					<sfd:PartnerName>
+						<comm:GivenName></comm:GivenName>
+						<comm:FamilyName></comm:FamilyName>
+					</sfd:PartnerName>
+					<sfd:PartnerPIN>00000000</sfd:PartnerPIN>
+					<sfd:PartnerBusinessOwnershipPercent>0</sfd:PartnerBusinessOwnershipPercent>
+				</sfd:PartnerCoOwnerData>
+				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['FishingActivityData']); ?>
+			</sfd:FishingActivityData>
+		<?php endif;
+		if ($sfdRow->Data_Type=='EMPLOYMENT'): ?>
+			<sfd:EmploymentExpenseData>
+				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['EmploymentExpenseData']); ?>
+			</sfd:EmploymentExpenseData>
+		<?php endif;
+		if ($sfdRow->Data_Type=='MEAL'): ?>
+			<sfd:MealLodgingExpenseData>
+				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['MealLodgingExpenseData']); ?>
+			</sfd:MealLodgingExpenseData>
+		<?php endif; ?>
+
+			<?php
 	}
 
 	/**
