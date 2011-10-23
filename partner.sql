@@ -39,7 +39,9 @@ CREATE TABLE IF NOT EXISTS `partner` (
 -- Dumping data for table `partner`
 --
 
-REPLACE INTO `partner` (`SFD_ID`, `Partner_ID`, `GivenName`, `FamilyName`, `PIN`, `OwnershipPercent`) VALUES
+REPLACE INTO `partner`
+(`SFD_ID`, `Partner_ID`, `GivenName`, `FamilyName`, `PIN`, `OwnershipPercent`)
+VALUES
 (1, 1, 'John', 'Doe', 0, 155000),
 (1, 2, 'Traver', 'Smith', 1234, 105000),
 (2, 3, 'MAC', 'BLACK', 0, 150000),
