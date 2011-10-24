@@ -256,15 +256,9 @@ EOS;
 				</tp:TaxpayerBasicData>
 				<tp:TaxpayerResidenceData>
 					<tp:TaxpayerYearEndResidenceProvinceCode><?php echo $taxpayerYearEndResidenceProvinceCode;?></tp:TaxpayerYearEndResidenceProvinceCode>
-					<?php if ( !empty($taxpayerCurrentResidenceProvinceCode)): ?>
-					<tp:TaxpayerCurrentResidenceProvinceCode><?php echo $taxpayerCurrentResidenceProvinceCode;?></tp:TaxpayerCurrentResidenceProvinceCode>
-					<?php endif; ?>
-					<?php if ( !empty($yukonFirstNationsSettlementNumber)): ?>
-					<tp:YukonFirstNationsSettlementNumber><?php echo $yukonFirstNationsSettlementNumber;?></tp:YukonFirstNationsSettlementNumber>
-					<?php endif; ?>
-					<?php if ( !empty($aboriginalLandResidenceIndicator)): ?>
-					<tp:AboriginalLandResidenceIndicator><?php echo $aboriginalLandResidenceIndicator;?></tp:AboriginalLandResidenceIndicator>
-					<?php endif; ?>
+					<?php $this->optElem("tp:TaxpayerCurrentResidenceProvinceCode", $taxpayerCurrentResidenceProvinceCode); ?>
+					<?php $this->optElem("tp:YukonFirstNationsSettlementNumber", $yukonFirstNationsSettlementNumber); ?>
+					<?php $this->optElem("tp:AboriginalLandResidenceIndicator", $aboriginalLandResidenceIndicator); ?>
 				</tp:TaxpayerResidenceData>
 				<tp:TaxpayerContactData>
 					<comm:TaxpayerName>
@@ -301,6 +295,12 @@ EOS;
 				</sfd:SelectedFinancialData>
 			<?php endforeach; ?>
 			<?php endif; // $SFDRecordCount > 0  ?>
+			<sfd:EmploymentExpenseData>
+				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['EmploymentExpenseData']); ?>
+			</sfd:EmploymentExpenseData>
+			<sfd:MealLodgingExpenseData>
+				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['MealLodgingExpenseData']); ?>
+			</sfd:MealLodgingExpenseData>
 		</t1:T1Return>
 	</net:T1Netfile>
 </net:Netfile>
@@ -320,121 +320,116 @@ EOS;
 	}
 
 	/**
+	 * Renders an optional elemnent if the value is present (not empty)
+	 * @param string $tag
+	 * @param string $value
+	 */
+	private function optElem( $tag, $value ) {
+		if (!empty($value)) echo "<".$tag.">".$value."</".$tag.">";
+	}
+
+	/**
 	 * Renders SFD record
 	 * @param object  $sfdRow SFD entry DB row
 	 * @param array() $returnLines Return lines
-	 * @param array() $validCodes  Valid codes
 	 */
-	private function createSFDElement( $sfdRow, $returnLines, $validCodes = NULL)
+	private function createSFDElement( $sfdRow, $returnLines)
 	{
 		if ( $sfdRow->Data_Type=='REAL' ): ?>
 			<sfd:RealEstateRentalData>
-				<sfd:BusinessNumber>123456789RT1234</sfd:BusinessNumber>
-				<sfd:NAICSCode>531111</sfd:NAICSCode>
-				<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
-				<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
-				<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
-				<sfd:BusinessOwnershipPercent>8450</sfd:BusinessOwnershipPercent>
-				<sfd:FinalBusinessYearIndicator>1</sfd:FinalBusinessYearIndicator>
-				<sfd:PartnerCoOwnerData>
-					<sfd:PartnerName>
-						<comm:GivenName>John</comm:GivenName>
-						<comm:FamilyName>Doe</comm:FamilyName>
-					</sfd:PartnerName>
-					<sfd:PartnerPIN>0</sfd:PartnerPIN>
-					<sfd:PartnerBusinessOwnershipPercent>155000</sfd:PartnerBusinessOwnershipPercent>
-				</sfd:PartnerCoOwnerData>
+				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
+				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE;?></sfd:NAICSCode>
+				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
+				<sfd:FiscalPeriodEndDate><?php echo $sfdRow->FiscalPeriodeEndDate;?></sfd:FiscalPeriodEndDate>
+				<?php $this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber); ?>
+				<?php $this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber); ?>
+				<?php $this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent); ?>
+				<?php $this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator); ?>
+				<?php $this->createPartnerCoOwnerDataElement( $sfdRow); ?>
 				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['RealEstateRentalData']); ?>
 			</sfd:RealEstateRentalData>
 		<?php endif;
 		if ($sfdRow->Data_Type=='BUSINESS'): ?>
-		<sfd:SelectedFinancialData>
 			<sfd:BusinessActivityData>
-				<sfd:BusinessNumber><?php echo $sfdRow->BusinessNumber; ?></sfd:BusinessNumber>
-				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE; ?></sfd:NAICSCode>
-				<sfd:BusinessName><?php echo $sfdRow->BusinessName; ?></sfd:BusinessName>
-				<sfd:PartnershipNumber><?php echo $sfdRow->PartnershipNumber; ?></sfd:PartnershipNumber>
-				<sfd:TaxShelterNumber><?php echo $sfdRow->TaxShelterNumber; ?></sfd:TaxShelterNumber>
-				<sfd:BusinessAddress>
-					<comm:BusinessAddressStreetText><?php echo $sfdRow->BusinessAddressStreetText; ?></comm:BusinessAddressStreetText>
-					<comm:AddressPostalCode><?php echo $sfdRow->AddressPostalCode; ?></comm:AddressPostalCode>
-				</sfd:BusinessAddress>
+				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
+				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE;?></sfd:NAICSCode>
+				<sfd:BusinessName><?php echo $sfdRow->BusinessName;?></sfd:BusinessName>
 				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
 				<sfd:FiscalPeriodEndDate><?php echo $sfdRow->FiscalPeriodeEndDate;?></sfd:FiscalPeriodEndDate>
-				<sfd:BusinessOwnershipPercent><?php echo $sfdRow->BusinessOwnershipPercent;?></sfd:BusinessOwnershipPercent>
-				<sfd:FinalBusinessYearIndicator><?php echo $sfdRow->FinalBusinessYearIndicator;?></sfd:FinalBusinessYearIndicator>
-				<sfd:PartnerCoOwnerData>
-					<sfd:PartnerName>
-						<comm:GivenName>MAC</comm:GivenName>
-						<comm:FamilyName>BLACK</comm:FamilyName>
-					</sfd:PartnerName>
-					<sfd:PartnerPIN>00000000</sfd:PartnerPIN>
-					<sfd:PartnerBusinessOwnershipPercent>150000</sfd:PartnerBusinessOwnershipPercent>
-				</sfd:PartnerCoOwnerData>
+				<?php $this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber); ?>
+				<?php $this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber); ?>
+				<?php $this->createBusinessAddressElement($sfdRow); ?>
+				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
+				<sfd:FiscalPeriodEndDate><?php echo $sfdRow->FiscalPeriodeEndDate;?></sfd:FiscalPeriodEndDate>
+				<?php $this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent); ?>
+				<?php $this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator); ?>
+				<?php $this->createPartnerCoOwnerDataElement( $sfdRow); ?>
 				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['BusinessActivityData']); ?>
 			</sfd:BusinessActivityData>
-		</sfd:SelectedFinancialData>
 		<?php endif;
 		if ($sfdRow->Data_Type=='PROFESSIONAL'): ?>
 			<sfd:ProfessionalActivityData>
-				<sfd:BusinessNumber>123456789AA2345</sfd:BusinessNumber>
-				<sfd:NAICSCode>541110</sfd:NAICSCode>
-				<sfd:BusinessName>James Publishing</sfd:BusinessName>
-				<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
-				<sfd:TaxShelterNumber>AB123456</sfd:TaxShelterNumber>
-				<sfd:BusinessAddress>
-					<comm:BusinessAddressStreetText>20 Spicer Street</comm:BusinessAddressStreetText>
-					<comm:AddressPostalCode>R2Y1C4</comm:AddressPostalCode>
-				</sfd:BusinessAddress>
-				<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
-				<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
-				<sfd:BusinessOwnershipPercent>0000</sfd:BusinessOwnershipPercent>
-				<sfd:FinalBusinessYearIndicator>2</sfd:FinalBusinessYearIndicator>
-				<sfd:PartnerCoOwnerData>
-					<sfd:PartnerName>
-						<comm:GivenName></comm:GivenName>
-						<comm:FamilyName></comm:FamilyName>
-					</sfd:PartnerName>
-					<sfd:PartnerPIN>00000000</sfd:PartnerPIN>
-					<sfd:PartnerBusinessOwnershipPercent>0</sfd:PartnerBusinessOwnershipPercent>
-				</sfd:PartnerCoOwnerData>
+				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
+				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE; ?></sfd:NAICSCode>
+				<sfd:BusinessName><?php echo $sfdRow->BusinessName; ?></sfd:BusinessName>
+				<?php $this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber); ?>
+				<?php $this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber); ?>
+				<?php $this->createBusinessAddressElement($sfdRow); ?>
+				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
+				<sfd:FiscalPeriodEndDate><?php echo $sfdRow->FiscalPeriodeEndDate;?></sfd:FiscalPeriodEndDate>
+				<?php $this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent); ?>
+				<?php $this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator); ?>
+				<?php $this->createPartnerCoOwnerDataElement( $sfdRow); ?>
 				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['ProfessionalActivityData']); ?>
 			</sfd:ProfessionalActivityData>
 		<?php endif;
 		if ($sfdRow->Data_Type=='FISHING'): ?>
 			<sfd:FishingActivityData>
-				<sfd:BusinessNumber>123456789AA2345</sfd:BusinessNumber>
-				<sfd:NAICSCode>114133</sfd:NAICSCode>
-				<sfd:BoatName>Colin's Fishery</sfd:BoatName>
-				<sfd:PartnershipNumber>123456789</sfd:PartnershipNumber>
-				<sfd:TaxShelterNumber>AA123456</sfd:TaxShelterNumber>
-				<sfd:FiscalPeriodStartDate>2011-01-01</sfd:FiscalPeriodStartDate>
-				<sfd:FiscalPeriodEndDate>2011-12-31</sfd:FiscalPeriodEndDate>
-				<sfd:BusinessOwnershipPercent>0000</sfd:BusinessOwnershipPercent>
-				<sfd:FinalBusinessYearIndicator>1</sfd:FinalBusinessYearIndicator>
-				<sfd:PartnerCoOwnerData>
-					<sfd:PartnerName>
-						<comm:GivenName></comm:GivenName>
-						<comm:FamilyName></comm:FamilyName>
-					</sfd:PartnerName>
-					<sfd:PartnerPIN>00000000</sfd:PartnerPIN>
-					<sfd:PartnerBusinessOwnershipPercent>0</sfd:PartnerBusinessOwnershipPercent>
-				</sfd:PartnerCoOwnerData>
+				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
+				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE; ?></sfd:NAICSCode>
+				<sfd:BoatName><?php echo $sfdRow->BusinessName; ?></sfd:BoatName>
+				<?php $this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber); ?>
+				<?php $this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber); ?>
+				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
+				<sfd:FiscalPeriodEndDate><?php echo $sfdRow->FiscalPeriodeEndDate;?></sfd:FiscalPeriodEndDate>
+				<?php $this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent); ?>
+				<?php $this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator); ?>
+				<?php $this->createPartnerCoOwnerDataElement( $sfdRow); ?>
 				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['FishingActivityData']); ?>
 			</sfd:FishingActivityData>
 		<?php endif;
-		if ($sfdRow->Data_Type=='EMPLOYMENT'): ?>
-			<sfd:EmploymentExpenseData>
-				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['EmploymentExpenseData']); ?>
-			</sfd:EmploymentExpenseData>
-		<?php endif;
-		if ($sfdRow->Data_Type=='MEAL'): ?>
-			<sfd:MealLodgingExpenseData>
-				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['MealLodgingExpenseData']); ?>
-			</sfd:MealLodgingExpenseData>
-		<?php endif; ?>
+	}
 
-			<?php
+	/**
+	 * Renders PartnerCoOwnerData emlement
+	 * @param object  $sfdRow SFD entry DB row with linked partner data
+	 */
+	private function createPartnerCoOwnerDataElement( $sfdRow )
+	{
+		if( isset($sfdRow->partners) ) foreach ( $sfdRow->partners as $p) { ?>
+				<sfd:PartnerCoOwnerData>
+					<sfd:PartnerName>
+						<comm:GivenName><?php echo $p->GivenName;?></comm:GivenName>
+						<comm:FamilyName><?php echo $p->FamilyName;?></comm:FamilyName>
+					</sfd:PartnerName>
+					<sfd:PartnerPIN><?php echo $p->PIN;?></sfd:PartnerPIN>
+					<sfd:PartnerBusinessOwnershipPercent><?php echo $p->OwnershipPercent;?></sfd:PartnerBusinessOwnershipPercent>
+				</sfd:PartnerCoOwnerData><?php
+		}
+	}
+
+	/**
+	 * Renders BusinessAddress emlement
+	 * @param object $sfdRow SFD entry DB row with linked partner data
+	 */
+	private function createBusinessAddressElement( $sfdRow )
+	{
+		if( !empty($sfdRow->BusinessAddressStreetText) || !empty($sfdRow->AddressPostalCode) ) { ?>
+				<sfd:BusinessAddress>
+					<comm:BusinessAddressStreetText><?php echo $sfdRow->BusinessAddressStreetText; ?></comm:BusinessAddressStreetText>
+					<comm:AddressPostalCode><?php echo $sfdRow->AddressPostalCode; ?></comm:AddressPostalCode>
+				</sfd:BusinessAddress><?php
+		}
 	}
 
 	/**

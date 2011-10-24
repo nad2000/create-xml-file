@@ -80,6 +80,25 @@ class DataSource {
 
 			$rows = $stmt->fetchAll(PDO::FETCH_CLASS);
 
+			// Partners
+			$stmt = $dbh->prepare(
+					"SELECT p.*
+					FROM partner AS p JOIN sfd_data AS s
+					  ON s.id = p.SFD_ID
+					WHERE s.user_id = ? AND s.tax_year = ?");
+			$stmt->execute( array( $userId, $taxYear ));
+
+			$partnerRows = $stmt->fetchAll(PDO::FETCH_CLASS);
+			// array of arrays:
+			$partners = array();
+			foreach ($partnerRows as $row) {
+				$partners[$row->SFD_ID][] = $row;
+			}
+			// link partners to SFD rows:
+			foreach ( $rows as $row ) {
+				if (!empty($partners[$row->id])) $row->partners = $partners[$row->id];
+			}
+
 			//$dbh = null;
 		} catch (PDOException $e) {
 			print "Error!: " . $e->getMessage() . "<br/>";
@@ -88,6 +107,4 @@ class DataSource {
 
 		return $rows;
 	}
-
-
 }
