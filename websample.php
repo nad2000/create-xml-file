@@ -8,9 +8,10 @@ require_once 'Netfile.php';
  * XML highlighting
  *
  * @param sting serialized XML
+ * @param boolean add line numbers
  * @return string formated and colorified XML
  */
-function xml_highlight($s)
+function xml_highlight($s, $with_line_no = FALSE)
 {
 	$s = htmlspecialchars($s);
 	$s = preg_replace("#&lt;([/]*?)(.*)([\s]*?)&gt;#sU",
@@ -25,6 +26,14 @@ function xml_highlight($s)
 		"<font color=\"#800080\">\\1</font>=<font color=\"#FF00FF\">\\2\\3\\4</font>",$s);
 	$s = preg_replace("#&lt;(.*)(\[)(.*)(\])&gt;#isU",
 		"&lt;\\1<font color=\"#800080\">\\2\\3\\4</font>&gt;",$s);
+	if ($with_line_no) {
+		$lines = explode("\n",$s);
+		$s = '<ol>';
+		foreach ($lines as $l) {
+			$s .= "<li>".$l."</li>";
+		}
+		$s .= "</ol>";
+	}
 	return nl2br($s);
 }
 
