@@ -346,19 +346,6 @@ EOS;
 	}
 
 	/**
-	 *
-	 * @param PDO row $row tabel row stdObject
-	 */
-	private function xmlEncodeRow( &$row) {
-		
-		foreach($row as $key => $value) {
-			if ( !empty($value) && is_string($value) ) {
-				$value = htmlentities($value);
-			}
-		}		
-	}
-	
-	/**
 	 * Renders SFD record
 	 * @param object  $sfdRow SFD entry DB row
 	 * @param array() $returnLines Return lines
