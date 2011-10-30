@@ -47,11 +47,10 @@ function display_errors( $errors) {
 $nefile = new Netfile();
 
 // 2. Create, validtate and return DOM Documenet representation of the T1Netfile document
-$doc = $nefile->createT1NetfileDoc( 2, 2010);
+$doc = $nefile->createT1NetfileDoc( 6, 2010);
 
 // 3. Check validation status and print out error messages
 if (!$nefile->isValid) display_errors ($nefile->errors);
 
 // 4. Optionally retrieve serialized XML document representation
-$xml = $nefile->XML;
-echo $xml;
+echo $nefile->Raw;

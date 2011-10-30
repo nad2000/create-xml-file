@@ -116,6 +116,9 @@ class Netfile{
 	/** @var DOMDocument XML DOM representation */
 	private $_xml = NULL;
 
+	/** @var string Raw document representation rendered using template */
+	private $_raw = NULL;
+
 	/**
 	 * @return DOMDocument Validated XML document
 	 */
@@ -137,13 +140,19 @@ class Netfile{
 	 */
 	private function createReturnLines( $returnLines, $validCodes = NULL)
 	{
-		foreach ( $returnLines as $line)
-			if ( empty($validCodes) || in_array($line->code, $validCodes)) echo <<<EOS
+		foreach ( $returnLines as $line) {
+			if ( ( empty($validCodes) && $line->code >= 100 && $line->code <= 8000 )
+					|| ( isset ($validCodes) && in_array($line->code, $validCodes) )
+				) 
+			{
+				echo <<<EOS
 <comm:ReturnLine>
 	<comm:FieldCode>{$line->code}</comm:FieldCode>
 	<comm:FieldValue>{$line->value}</comm:FieldValue>
 </comm:ReturnLine>
 EOS;
+			}
+		}
 	}
 
 	//function __construct() {
@@ -205,8 +214,8 @@ EOS;
 			$lineId = $row->line_id;
 			if (	$row->line_type == 'TRC_L'
 					&& is_numeric($row->field_code)
-					&& $row->field_code >= 100
-					&& $row->field_code <= 8000)
+					&& $row->field_code >=   100
+					/* && $row->field_code <= 8000 */ )
 			{
 				$returnLines[] = (object) array(
 					'type'=>$row->line_type,
@@ -241,7 +250,9 @@ EOS;
 	xmlns:sdt="http://www.cra-arc.gc.ca/xmlns/sdt/2-0-0"
 	xmlns:sfd="http://www.cra-arc.gc.ca/xmlns/sfd/2012/1-0-0"
 	xmlns:t1="http://www.cra-arc.gc.ca/xmlns/t1/2012/1-0-0"
-	xmlns:tp="http://www.cra-arc.gc.ca/xmlns/tp/2012/1-0-0">
+	xmlns:tp="http://www.cra-arc.gc.ca/xmlns/tp/2012/1-0-0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+	xsi:schemaLocation="http://www.cra-arc.gc.ca/xmlns/netfile/2012/1-0-0 xsd/netfile.xsd">
 	<net:T1Netfile>
 		<t1:T1Return>
 			<comm:SoftwareID><?php echo self::SoftwareID;?></comm:SoftwareID>
@@ -295,12 +306,16 @@ EOS;
 				</sfd:SelectedFinancialData>
 			<?php endforeach; ?>
 			<?php endif; // $SFDRecordCount > 0  ?>
-			<sfd:EmploymentExpenseData>
-				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['EmploymentExpenseData']); ?>
-			</sfd:EmploymentExpenseData>
-			<sfd:MealLodgingExpenseData>
-				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['MealLodgingExpenseData']); ?>
-			</sfd:MealLodgingExpenseData>
+			<sfd:SelectedFinancialData>
+				<sfd:EmploymentExpenseData>
+					<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['EmploymentExpenseData']); ?>
+				</sfd:EmploymentExpenseData>
+			</sfd:SelectedFinancialData>
+			<sfd:SelectedFinancialData>
+				<sfd:MealLodgingExpenseData>
+					<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['MealLodgingExpenseData']); ?>
+				</sfd:MealLodgingExpenseData>
+			</sfd:SelectedFinancialData>
 		</t1:T1Return>
 	</net:T1Netfile>
 </net:Netfile>
@@ -308,6 +323,7 @@ EOS;
 		$xmlStr=ob_get_contents();
 		ob_end_clean();
 
+		$this->_raw = $xmlStr;
 		$this->_xml = new DOMDocument();
 		$this->_xml->loadXML($xmlStr);
 		$this->_xml->xinclude();
@@ -319,6 +335,7 @@ EOS;
 
 	}
 
+	
 	/**
 	 * Renders an optional elemnent if the value is present (not empty)
 	 * @param string $tag
@@ -329,12 +346,26 @@ EOS;
 	}
 
 	/**
+	 *
+	 * @param PDO row $row tabel row stdObject
+	 */
+	private function xmlEncodeRow( &$row) {
+		
+		foreach($row as $key => $value) {
+			if ( !empty($value) && is_string($value) ) {
+				$value = htmlentities($value);
+			}
+		}		
+	}
+	
+	/**
 	 * Renders SFD record
 	 * @param object  $sfdRow SFD entry DB row
 	 * @param array() $returnLines Return lines
 	 */
 	private function createSFDElement( $sfdRow, $returnLines)
 	{
+		$this->xmlEncodeRow($sfdRow);
 		if ( $sfdRow->Data_Type=='REAL' ): ?>
 			<sfd:RealEstateRentalData>
 				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
@@ -353,9 +384,7 @@ EOS;
 			<sfd:BusinessActivityData>
 				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
 				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE;?></sfd:NAICSCode>
-				<sfd:BusinessName><?php echo $sfdRow->BusinessName;?></sfd:BusinessName>
-				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
-				<sfd:FiscalPeriodEndDate><?php echo $sfdRow->FiscalPeriodeEndDate;?></sfd:FiscalPeriodEndDate>
+				<sfd:BusinessName><?php echo htmlentities($sfdRow->BusinessName);?></sfd:BusinessName>
 				<?php $this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber); ?>
 				<?php $this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber); ?>
 				<?php $this->createBusinessAddressElement($sfdRow); ?>
@@ -371,7 +400,7 @@ EOS;
 			<sfd:ProfessionalActivityData>
 				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
 				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE; ?></sfd:NAICSCode>
-				<sfd:BusinessName><?php echo $sfdRow->BusinessName; ?></sfd:BusinessName>
+				<sfd:BusinessName><?php echo htmlentities($sfdRow->BusinessName); ?></sfd:BusinessName>
 				<?php $this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber); ?>
 				<?php $this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber); ?>
 				<?php $this->createBusinessAddressElement($sfdRow); ?>
@@ -387,7 +416,7 @@ EOS;
 			<sfd:FishingActivityData>
 				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
 				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE; ?></sfd:NAICSCode>
-				<sfd:BoatName><?php echo $sfdRow->BusinessName; ?></sfd:BoatName>
+				<sfd:BoatName><?php echo htmlentities($sfdRow->BusinessName); ?></sfd:BoatName>
 				<?php $this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber); ?>
 				<?php $this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber); ?>
 				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
@@ -443,6 +472,7 @@ EOS;
 		else if ($variable == 'errors') return $this->_errors;
 		else if ($variable == 'XML') return $this->getXML();
 		else if ($variable == 'Doc') return $this->getDoc();
+		else if ($variable == 'Raw') return $this->_raw;
 		return $this->{$variable};
 	}
 }
