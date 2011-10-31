@@ -25,10 +25,10 @@ function display_error($error)
             break;
     }
     $return .= trim($error->message);
-    if ($error->file) {
+    if (isset ($error->file) && $error->file) {
         $return .=    " in <b>$error->file</b>";
     }
-    $return .= " on line <b>$error->line</b>\n";
+    if ( isset($error->line) ) $return .= " on line <b>$error->line</b>\n";
 
     return $return;
 }

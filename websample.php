@@ -24,17 +24,18 @@ function xml_highlight($s, $with_line_no = FALSE)
 		"&lt;\\1<font color=\"#808000\">\\2</font>\\3&gt;",$s);
 	$s = preg_replace("#([^\s]*?)\=(&quot;|')(.*)(&quot;|')#isU",
 		"<font color=\"#800080\">\\1</font>=<font color=\"#FF00FF\">\\2\\3\\4</font>",$s);
-	$s = preg_replace("#&lt;(.*)(\[)(.*)(\])&gt;#isU",
-		"&lt;\\1<font color=\"#800080\">\\2\\3\\4</font>&gt;",$s);
-	if ($with_line_no) {
-		$lines = explode("\n",$s);
-		$s = '<ol>';
-		foreach ($lines as $l) {
-			$s .= "<li>".$l."</li>";
-		}
-		$s .= "</ol>";
-	}
-	return nl2br($s);
+	return $s;
+//	$s = preg_replace("#&lt;(.*)(\[)(.*)(\])&gt;#isU",
+//		"&lt;\\1<font color=\"#800080\">\\2\\3\\4</font>&gt;",$s);
+//	if ($with_line_no) {
+//		$lines = explode("\n",$s);
+//		$s = '<ol>';
+//		foreach ($lines as $l) {
+//			$s .= "<li>".$l."</li>";
+//		}
+//		$s .= "</ol>";
+//	}
+//	return $s;
 }
 
 /**

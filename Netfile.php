@@ -166,6 +166,8 @@ EOS;
 	public function createT1NetfileDoc(
 		$userId = 2,
 		$taxYear = 2010) {
+		
+		$this->_errors = array();
 
 		// default element values: ''
 		foreach ( static::$_elementList as $elment) {
@@ -210,13 +212,14 @@ EOS;
 		// Return Lines
 		$returnLines = array();
 
+		$mainReturnLineCount = 0;
 		foreach( $data as $row ) {
 			$lineId = $row->line_id;
 			if (	$row->line_type == 'TRC_L'
 					&& is_numeric($row->field_code)
-					&& $row->field_code >=   100
-					/* && $row->field_code <= 8000 */ )
+					&& $row->field_code >=   100 )
 			{
+				if ( $row->field_code <= 800) $mainReturnLineCount++;
 				$returnLines[] = (object) array(
 					'type'=>$row->line_type,
 					'code'=> intval($row->field_code),
@@ -236,9 +239,17 @@ EOS;
 			elseif ( in_array ( $lineId, static::$_elementList ) )
 				${lcfirst($lineId)} = $row->line_value;
 		}
+		if ($mainReturnLineCount > 80) {
+			$this->_errors[] = (object)array( 'message' => "Return lines exceeds maximum (80): $mainReturnLineCount");
+		}
 
 		$sfdData = DataSource::getSFDData( $userId = $userId, $taxYear = $taxYear);
 		$SFDRecordCount = count( $sfdData);
+
+		if ($SFDRecordCount > 6) {
+			$this->_errors[] = (object)array( 'message' => "SFD records exceed maximum (6): $SFDRecordCount" );
+		}
+		
 		// generating teh document:
 		ob_start();
 		echo "<?xml version=\"1.0\"?>\n";
@@ -329,7 +340,7 @@ EOS;
 		$this->_xml->xinclude();
 
 		$this->_isValid = $this->_xml->schemaValidate( dirname(__FILE__) . '/xsd/netfile.xsd' );
-		$this->_errors = $this->_isValid ? NULL : libxml_get_errors();
+		if( !$this->_isValid ) $this->_errors = array_merge( $this->_errors, libxml_get_errors());
 		libxml_clear_errors();
 		return $this->_xml;
 
@@ -352,7 +363,6 @@ EOS;
 	 */
 	private function createSFDElement( $sfdRow, $returnLines)
 	{
-		$this->xmlEncodeRow($sfdRow);
 		if ( $sfdRow->Data_Type=='REAL' ): ?>
 			<sfd:RealEstateRentalData>
 				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
