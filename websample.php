@@ -58,7 +58,7 @@ function display_error($error)
             break;
     }
     $return .= trim($error->message);
-    if ($error->file) {
+    if (isset($error->file) && $error->file) {
         $return .=    " in <b>$error->file</b>";
     }
     $return .= " on line <b>$error->line</b>\n";
@@ -91,7 +91,7 @@ $doc = $nefile->createT1NetfileDoc( $userId, $taxYear);
 if (!$nefile->isValid) { ?>
 <html>
 	<head>
-		<title>Error Messages</title>
+		<title>Demo</title>
 	</head>
 	<body>
 		<h1>Document validation Error Messages</h1>

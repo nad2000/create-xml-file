@@ -167,9 +167,30 @@ EOS;
 			}
 		}
 	}
+	
+	/**
+	 * Test if among return lines are rows for getHasEmploymentExpenseData
+	 * @return boolean 
+	 */
+	private function getHasEmploymentExpenseData() {
+		if( empty( $this->_hasEmploymentExpenseData) )
+			$this->_hasEmploymentExpenseData = $this->returnLinesHasCodes(
+					$this->_returnLines, 
+					static::$_validSFDcodes['EmploymentExpenseData']); 
+		return $this->_hasEmploymentExpenseData;
+	}
 
-	//function __construct() {
-    //}
+	/**
+	 * Test if among return lines are rows for MealLodgingExpenseData
+	 * @return boolean 
+	 */
+	private function getHasMealLodgingExpenseData() {
+		if( empty( $this->_hasMealLodgingExpenseData) )
+			$this->_hasMealLodgingExpenseData = $this->returnLinesHasCodes(
+					$this->_returnLines,
+					static::$_validSFDcodes['MealLodgingExpenseData']); 
+		return $this->_hasMealLodgingExpenseData;
+	}
 
 	/**
 	 * @param int $userId User ID
@@ -187,7 +208,7 @@ EOS;
 			${lcfirst($elment)} = '';
 		}
 
-		// Uncomment, if you need to set other default vlues
+		// Uncomment, if you need to set other default values
 		//$addressPostalCode='';
 		//$addressProvinceCode='';
 		//$alternateAddressAuthorizationCode='';
@@ -252,15 +273,28 @@ EOS;
 			elseif ( in_array ( $lineId, static::$_elementList ) )
 				${lcfirst($lineId)} = $row->line_value;
 		}
+		$this->_returnLines = $returnLines;
 		if ($mainReturnLineCount > 80) {
-			$this->_errors[] = (object)array( 'message' => "Return lines exceeds maximum (80): $mainReturnLineCount");
+			$this->_errors[] = (object)array( 
+				'level' => 'VALIDATION',
+				'line' => 0,
+				'file' => '',
+				'code' => '',
+				'message' => "Return lines exceeds maximum (80): $mainReturnLineCount");
 		}
 
 		$sfdData = DataSource::getSFDData( $userId = $userId, $taxYear = $taxYear);
 		$SFDRecordCount = count( $sfdData);
-
+		if ($this->HasEmploymentExpenseData) $SFDRecordCount++;
+		if ($this->HasMealLodgingExpenseData) $SFDRecordCount++;
+		
 		if ($SFDRecordCount > 6) {
-			$this->_errors[] = (object)array( 'message' => "SFD records exceed maximum (6): $SFDRecordCount" );
+			$this->_errors[] = (object)array( 
+				'level' => 'VALIDATION',
+				'line' => 0,
+				'file' => '',
+				'code' => '',
+				'message' => "SFD records exceed maximum (6): $SFDRecordCount" );
 		}
 		
 		// generating teh document:
@@ -330,14 +364,14 @@ EOS;
 				</sfd:SelectedFinancialData>
 			<?php endforeach; ?>
 			<?php endif; 
-			if ($this->returnLinesHasCodes($returnLines, static::$_validSFDcodes['EmploymentExpenseData'])): ?>
+			if ($this->HasEmploymentExpenseData): ?>
 			<sfd:SelectedFinancialData>
 				<sfd:EmploymentExpenseData>
 					<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['EmploymentExpenseData']); ?>
 				</sfd:EmploymentExpenseData>
 			</sfd:SelectedFinancialData>
 			<?php endif;
-			if ($this->returnLinesHasCodes($returnLines, static::$_validSFDcodes['MealLodgingExpenseData'])): ?>
+			if ($this->HasMealLodgingExpenseData): ?>
 			<sfd:SelectedFinancialData>
 				<sfd:MealLodgingExpenseData>
 					<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['MealLodgingExpenseData']); ?>
@@ -504,6 +538,8 @@ EOS;
 		else if ($variable == 'XML') return $this->getXML();
 		else if ($variable == 'Doc') return $this->getDoc();
 		else if ($variable == 'Raw') return $this->_raw;
+		else if ($variable == 'HasEmploymentExpenseData') return $this->getHasEmploymentExpenseData();
+		else if ($variable == 'HasMealLodgingExpenseData') return $this->getHasMealLodgingExpenseData();
 		return $this->{$variable};
 	}
 }
