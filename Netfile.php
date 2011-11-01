@@ -134,6 +134,19 @@ class Netfile{
 	}
 
 	/**
+	 * @param array() $returnLines Return lines
+	 * @param array() $validCodes  Valid codes
+	 * @return boolean among the return lines are lines with the specified codes.
+	 */
+	private function returnLinesHasCodes( $returnLines, $validCodes)
+	{
+		foreach ( $returnLines as $line) {
+			if (in_array($line->code, $validCodes) ) return TRUE;
+		}
+		return FALSE;
+	}
+	
+	/**
 	 * Prints out ReturnLine element sequece
 	 * @param array() $returnLines Return lines
 	 * @param array() $validCodes  Valid codes
@@ -316,17 +329,21 @@ EOS;
 					<?php $this->createSFDElement($sfdRow, $returnLines); ?>
 				</sfd:SelectedFinancialData>
 			<?php endforeach; ?>
-			<?php endif; // $SFDRecordCount > 0  ?>
+			<?php endif; 
+			if ($this->returnLinesHasCodes($returnLines, static::$_validSFDcodes['EmploymentExpenseData'])): ?>
 			<sfd:SelectedFinancialData>
 				<sfd:EmploymentExpenseData>
 					<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['EmploymentExpenseData']); ?>
 				</sfd:EmploymentExpenseData>
 			</sfd:SelectedFinancialData>
+			<?php endif;
+			if ($this->returnLinesHasCodes($returnLines, static::$_validSFDcodes['MealLodgingExpenseData'])): ?>
 			<sfd:SelectedFinancialData>
 				<sfd:MealLodgingExpenseData>
 					<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['MealLodgingExpenseData']); ?>
 				</sfd:MealLodgingExpenseData>
 			</sfd:SelectedFinancialData>
+			<?php endif; ?>
 		</t1:T1Return>
 	</net:T1Netfile>
 </net:Netfile>
@@ -424,6 +441,20 @@ EOS;
 				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['FishingActivityData']); ?>
 			</sfd:FishingActivityData>
 		<?php endif;
+		if ($sfdRow->Data_Type=='FARMING'):?>
+			<sfd:FarmingActivityData>
+				<sfd:AccountingMethodCode><?php echo $sfdRow->AccountingMethodCode; ?></sfd:AccountingMethodCode>
+				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
+				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE; ?></sfd:NAICSCode>
+				<sfd:FarmName><?php echo htmlentities($sfdRow->BusinessName); ?></sfd:FarmName>
+				<?php $this->createBusinessAddressElement($sfdRow); ?>
+				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
+				<sfd:FiscalPeriodEndDate><?php echo $sfdRow->FiscalPeriodeEndDate;?></sfd:FiscalPeriodEndDate>
+				<?php $this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent); ?>
+				<?php $this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator); ?>
+				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['FarmingActivityData']); ?>
+			</sfd:FarmingActivityData>
+		<?php endif;
 	}
 
 	/**
@@ -450,11 +481,14 @@ EOS;
 	 */
 	private function createBusinessAddressElement( $sfdRow )
 	{
-		if( !empty($sfdRow->BusinessAddressStreetText) || !empty($sfdRow->AddressPostalCode) ) { ?>
-				<sfd:BusinessAddress>
-					<comm:BusinessAddressStreetText><?php echo $sfdRow->BusinessAddressStreetText; ?></comm:BusinessAddressStreetText>
-					<comm:AddressPostalCode><?php echo $sfdRow->AddressPostalCode; ?></comm:AddressPostalCode>
-				</sfd:BusinessAddress><?php
+		if( !empty($sfdRow->BusinessAddressStreetText) || !empty($sfdRow->AddressPostalCode) ) {
+			$isFarming = ($sfdRow->Data_Type=='FARMING');
+			echo $isFarming ? '<sfd:FarmAddress>':'<sfd:BusinessAddress>';
+			echo <<<EOS
+	<comm:BusinessAddressStreetText>{$sfdRow->BusinessAddressStreetText}</comm:BusinessAddressStreetText>
+	<comm:AddressPostalCode>{$sfdRow->AddressPostalCode}</comm:AddressPostalCode>
+EOS;
+			echo $isFarming ? '</sfd:FarmAddress>':'</sfd:BusinessAddress>';
 		}
 	}
 
