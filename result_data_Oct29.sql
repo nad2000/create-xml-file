@@ -563,3 +563,10 @@ VALUES
 (6, 2010, 'TRC_L_9760', '15', '', '', 0, NULL, '5190', '2011-10-29 10:22:17', NULL),
 (6, 2010, 'TRC_L_9898', '15', '', '', 0, NULL, '11000', '2011-10-29 10:22:17', NULL),
 (6, 2010, 'TRC_L_9946', '15', '', '', 0, NULL, '6900', '2011-10-29 10:22:17', NULL);
+
+
+-- delete extra lines:
+DELETE FROM result_data
+WHERE SUBSTRING_INDEX(line_id,'_',2) = 'TRC_L'
+  AND SUBSTRING_INDEX(line_id,'_',-1) < 800
+  AND id % 2 =0;

@@ -387,8 +387,8 @@ EOS;
 			</t1:RelatedProgramData>
 			<?php $this->createReturnLines($returnLines); ?>
 			<?php if ($SFDRecordCount > 0):
-				$this->xmlElem('t1:SelectedFinancialDataRecordCount', printf( "%02d", $SFDRecordCount)); ?>
-				<?php foreach ($sfdData as $sfdRow): ?>
+				$this->xmlElem('t1:SelectedFinancialDataRecordCount', sprintf( "%02d", $SFDRecordCount));
+				foreach ($sfdData as $sfdRow): ?>
 					<sfd:SelectedFinancialData>
 						<?php $this->createSFDElement($sfdRow, $returnLines); ?>
 					</sfd:SelectedFinancialData>
@@ -450,7 +450,7 @@ EOS;
 			$value = $this->_data[$_tag];
 		}
 		if ( $optional && empty($value)) return;
-		echo "<".$tag.">".htmlentities($value)."</".$tag.">";
+		echo "<$tag>".htmlentities($value)."</$tag>";
 	}
 	
 	
