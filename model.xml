@@ -15,7 +15,16 @@
 				<tp:TaxpayerResidenceData>
 					<tp:TaxpayerYearEndResidenceProvinceCode>NS</tp:TaxpayerYearEndResidenceProvinceCode>
 					<tp:TaxpayerCurrentResidenceProvinceCode>NS</tp:TaxpayerCurrentResidenceProvinceCode>
+					<tp:YukonFirstNationsSettlementNumber>11001</tp:YukonFirstNationsSettlementNumber>
+					<tp:AboriginalLandResidenceIndicator>1</tp:AboriginalLandResidenceIndicator>
 				</tp:TaxpayerResidenceData>
+				<tp:TaxpayerSpouseData>
+					<tp:SpouseSocialInsuranceNumber>11234443</tp:SpouseSocialInsuranceNumber>
+					<tp:SpouseGivenName></tp:SpouseGivenName>
+					<tp:SpouseUniversalChildCareBenefitAmount></tp:SpouseUniversalChildCareBenefitAmount>
+					<tp:SpouseNetIncomeAmount></tp:SpouseNetIncomeAmount>
+					<tp:SpouseUniversalChildCareRepaymentAmount></tp:SpouseUniversalChildCareRepaymentAmount>
+				</tp:TaxpayerSpouseData>
 				<tp:TaxpayerContactData>
 					<comm:TaxpayerName>
 						<comm:GivenName></comm:GivenName>
@@ -425,7 +434,25 @@
 				</sfd:FishingActivityData>
 			</sfd:SelectedFinancialData>
 			<sfd:SelectedFinancialData>
-				<sfd:EmploymentExpenseData>
+			<sfd:FarmingActivityData>
+				<sfd:AccountingMethodCode>1</sfd:AccountingMethodCode>
+				<sfd:BusinessNumber>123456789012345</sfd:BusinessNumber>
+				<sfd:NAICSCode>123456</sfd:NAICSCode>
+				<sfd:FarmName></sfd:FarmName>
+				<sfd:FarmAddress>
+					<comm:BusinessAddressStreetText></comm:BusinessAddressStreetText>
+					<comm:AddressPostalCode>A1B1C1</comm:AddressPostalCode>
+				</sfd:FarmAddress>
+				<sfd:FiscalPeriodStartDate></sfd:FiscalPeriodStartDate>
+				<sfd:FiscalPeriodEndDate></sfd:FiscalPeriodEndDate>
+				<sfd:BusinessOwnershipPercent></sfd:BusinessOwnershipPercent>
+				<sfd:FinalBusinessYearIndicator>2</sfd:FinalBusinessYearIndicator>
+				<comm:ReturnLine>
+					<comm:FieldCode></comm:FieldCode>
+					<comm:FieldValue></comm:FieldValue>
+				</comm:ReturnLine>
+			</sfd:FarmingActivityData>
+				<!--sfd:EmploymentExpenseData>
 					<comm:ReturnLine>
 							<comm:FieldCode>8862</comm:FieldCode>
 							<comm:FieldValue>350</comm:FieldValue>
@@ -466,7 +493,7 @@
 							<comm:FieldCode>9368</comm:FieldCode>
 							<comm:FieldValue>5420</comm:FieldValue>
 					</comm:ReturnLine>
-				</sfd:EmploymentExpenseData>
+				</sfd:EmploymentExpenseData-->
 			</sfd:SelectedFinancialData>
 			<!-- sfd:SelectedFinancialData>
 				<sfd:MealLodgingExpenseData>

@@ -49,6 +49,11 @@ class Netfile{
 		'PartnershipNumber',
 		'SelectedFinancialDataRecordCount',
 		'SelfEmployedSpouseDeadlineIndicator',
+		'SpouseGivenName',
+		'SpouseNetIncomeAmount',
+		'SpouseSocialInsuranceNumber',
+		'SpouseUniversalChildCareBenefitAmount',
+		'SpouseUniversalChildCareRepaymentAmount',
 		'TaxpayerBirthDate',
 		'TaxpayerCurrentResidenceProvinceCode',
 		'TaxpayerMaritalStatusCode',
@@ -191,8 +196,26 @@ EOS;
 					static::$_validSFDcodes['MealLodgingExpenseData']); 
 		return $this->_hasMealLodgingExpenseData;
 	}
-
+	
 	/**
+	 * Add validation error message to the error list
+	 * @param string $message validation message
+	 * @return errror object structuraly similar to XML validation error object
+	 */
+	private function addValidationError( $message) {
+		$err = (object)array( 
+					'level' => 'VALIDATION',
+					'line' => 0,
+					'file' => '',
+					'code' => '',
+					'message' => $message);
+		$this->_errors[] = $err;
+		$this->_isValid = FALSE;
+		return $err;
+	}
+
+
+		/**
 	 * @param int $userId User ID
 	 * @param int $taxYear Tax Year
 	 * @return DOMDocument Validated XML document
@@ -242,6 +265,7 @@ EOS;
 		//$telephoneLocalNumber='';
 
 		$data = DataSource::getData( $userId = $userId, $taxYear = $taxYear);
+		$this->_data = array();
 
 		// Return Lines
 		$returnLines = array();
@@ -270,32 +294,21 @@ EOS;
 						$professionalActivityData;
 						$realEstateRentalData; */
 			}
-			elseif ( in_array ( $lineId, static::$_elementList ) )
-				${lcfirst($lineId)} = $row->line_value;
+			elseif ( in_array ( $lineId, static::$_elementList ) ) {
+				${lcfirst($lineId)} = $this->_data[$lineId] = $row->line_value;
+			}
 		}
 		$this->_returnLines = $returnLines;
-		if ($mainReturnLineCount > 80) {
-			$this->_errors[] = (object)array( 
-				'level' => 'VALIDATION',
-				'line' => 0,
-				'file' => '',
-				'code' => '',
-				'message' => "Return lines exceeds maximum (80): $mainReturnLineCount");
-		}
+		if ($mainReturnLineCount > 80)
+			$this->addValidationError( "Return lines exceeds maximum (80): $mainReturnLineCount");
 
 		$sfdData = DataSource::getSFDData( $userId = $userId, $taxYear = $taxYear);
 		$SFDRecordCount = count( $sfdData);
 		if ($this->HasEmploymentExpenseData) $SFDRecordCount++;
 		if ($this->HasMealLodgingExpenseData) $SFDRecordCount++;
 		
-		if ($SFDRecordCount > 6) {
-			$this->_errors[] = (object)array( 
-				'level' => 'VALIDATION',
-				'line' => 0,
-				'file' => '',
-				'code' => '',
-				'message' => "SFD records exceed maximum (6): $SFDRecordCount" );
-		}
+		if ($SFDRecordCount > 6)
+			$this->addValidationError( "SFD records exceed maximum (6): $SFDRecordCount");
 		
 		// generating teh document:
 		ob_start();
@@ -317,52 +330,69 @@ EOS;
 			<comm:SoftwareRevisionDate><?php echo self::SoftwareRevisionDate;?></comm:SoftwareRevisionDate>
 			<t1:TaxpayerData>
 				<tp:TaxpayerBasicData>
-					<tp:TaxpayerSocialInsuranceNumber><?php echo $taxpayerSocialInsuranceNumber;?></tp:TaxpayerSocialInsuranceNumber>
-					<tp:TaxYear><?php echo $taxYear;?></tp:TaxYear>
-					<tp:TaxpayerBirthDate><?php echo $taxpayerBirthDate;?></tp:TaxpayerBirthDate>
-					<tp:TaxpayerMaritalStatusCode><?php echo $taxpayerMaritalStatusCode;?></tp:TaxpayerMaritalStatusCode>
-					<tp:SelfEmployedSpouseDeadlineIndicator><?php echo $selfEmployedSpouseDeadlineIndicator;?></tp:SelfEmployedSpouseDeadlineIndicator>
+					<?php 
+					$this->xmlElem('tp:TaxpayerSocialInsuranceNumber');
+					$this->xmlElem('tp:TaxYear', $taxYear);
+					$this->xmlElem('tp:TaxpayerBirthDate');
+					$this->xmlElem('tp:TaxpayerMaritalStatusCode');
+					$this->xmlElem('tp:SelfEmployedSpouseDeadlineIndicator'); ?>
 				</tp:TaxpayerBasicData>
 				<tp:TaxpayerResidenceData>
-					<tp:TaxpayerYearEndResidenceProvinceCode><?php echo $taxpayerYearEndResidenceProvinceCode;?></tp:TaxpayerYearEndResidenceProvinceCode>
-					<?php $this->optElem("tp:TaxpayerCurrentResidenceProvinceCode", $taxpayerCurrentResidenceProvinceCode); ?>
-					<?php $this->optElem("tp:YukonFirstNationsSettlementNumber", $yukonFirstNationsSettlementNumber); ?>
-					<?php $this->optElem("tp:AboriginalLandResidenceIndicator", $aboriginalLandResidenceIndicator); ?>
+					<?php
+					$this->xmlElem('tp:TaxpayerYearEndResidenceProvinceCode');
+					$this->optElem("tp:TaxpayerCurrentResidenceProvinceCode");
+					$this->optElem("tp:YukonFirstNationsSettlementNumber");
+					$this->optElem("tp:AboriginalLandResidenceIndicator"); ?>
 				</tp:TaxpayerResidenceData>
+				<?php if ( !empty($spouseSocialInsuranceNumber)): ?>
+				<tp:TaxpayerSpouseData>
+					<?php
+					$this->xmlElem('tp:SpouseSocialInsuranceNumber');
+					$this->optElem("tp:SpouseGivenName");
+					$this->optElem("tp:SpouseUniversalChildCareBenefitAmount");
+					$this->optElem("tp:SpouseNetIncomeAmount");
+					$this->optElem("tp:SpouseUniversalChildCareRepaymentAmount"); ?>
+				</tp:TaxpayerSpouseData>
+				<?php endif; ?>
 				<tp:TaxpayerContactData>
 					<comm:TaxpayerName>
-						<comm:GivenName><?php echo $givenName;?></comm:GivenName>
-						<comm:FamilyName><?php echo $familyName;?></comm:FamilyName>
+						<?php 
+						$this->xmlElem('comm:GivenName');
+						$this->xmlElem('comm:FamilyName');?>
 					</comm:TaxpayerName>
 					<tp:TaxpayerMailingAddress>
 						<comm:CanadianMailingAddress>
-							<comm:AddressStreetText><?php echo $addressStreetText;?></comm:AddressStreetText>
-							<comm:AddressMunicipalityName><?php echo $addressMunicipalityName;?></comm:AddressMunicipalityName>
-							<comm:AddressProvinceCode><?php echo $addressProvinceCode;?></comm:AddressProvinceCode>
-							<comm:AddressPostalCode><?php echo $addressPostalCode;?></comm:AddressPostalCode>
+							<?php
+							$this->xmlElem('comm:AddressStreetText');
+							$this->xmlElem('comm:AddressMunicipalityName');
+							$this->xmlElem('comm:AddressProvinceCode');
+							$this->xmlElem('comm:AddressPostalCode');?>
 						</comm:CanadianMailingAddress>
 					</tp:TaxpayerMailingAddress>
 					<tp:TaxpayerHomeTelephoneNumber>
-						<comm:TelephoneAreaCode><?php echo $telephoneAreaCode;?></comm:TelephoneAreaCode>
-						<comm:TelephoneLocalNumber><?php echo $telephoneLocalNumber;?></comm:TelephoneLocalNumber>
+						<?php
+						$this->xmlElem('comm:TelephoneAreaCode');
+						$this->xmlElem('comm:TelephoneLocalNumber');?>
 					</tp:TaxpayerHomeTelephoneNumber>
-					<tp:AlternateAddressAuthorizationCode><?php echo $alternateAddressAuthorizationCode;?></tp:AlternateAddressAuthorizationCode>
-					<tp:CorrespondenceLanguageCode><?php echo $correspondenceLanguageCode;?></tp:CorrespondenceLanguageCode>
+					<?php
+					$this->xmlElem('tp:AlternateAddressAuthorizationCode');
+					$this->xmlElem('tp:CorrespondenceLanguageCode');?>
 				</tp:TaxpayerContactData>
 			</t1:TaxpayerData>
 			<t1:RelatedProgramData>
-				<t1:CanadianCitizenshipIndicator><?php echo $canadianCitizenshipIndicator;?></t1:CanadianCitizenshipIndicator>
-				<t1:ElectionsCanadaAuthorizationIndicator><?php echo $electionsCanadaAuthorizationIndicator;?></t1:ElectionsCanadaAuthorizationIndicator>
-				<t1:GSTHSTCreditApplicationIndicator><?php echo $gSTHSTCreditApplicationIndicator;?></t1:GSTHSTCreditApplicationIndicator>
+				<?php
+				$this->xmlElem('t1:CanadianCitizenshipIndicator');
+				$this->xmlElem('t1:ElectionsCanadaAuthorizationIndicator');
+				$this->xmlElem('t1:GSTHSTCreditApplicationIndicator');?>
 			</t1:RelatedProgramData>
 			<?php $this->createReturnLines($returnLines); ?>
-			<?php if ($SFDRecordCount > 0): ?>
-			<t1:SelectedFinancialDataRecordCount><?php printf( "%02d", $SFDRecordCount);  ?></t1:SelectedFinancialDataRecordCount>
-			<?php foreach ($sfdData as $sfdRow): ?>
-				<sfd:SelectedFinancialData>
-					<?php $this->createSFDElement($sfdRow, $returnLines); ?>
-				</sfd:SelectedFinancialData>
-			<?php endforeach; ?>
+			<?php if ($SFDRecordCount > 0):
+				$this->xmlElem('t1:SelectedFinancialDataRecordCount', printf( "%02d", $SFDRecordCount)); ?>
+				<?php foreach ($sfdData as $sfdRow): ?>
+					<sfd:SelectedFinancialData>
+						<?php $this->createSFDElement($sfdRow, $returnLines); ?>
+					</sfd:SelectedFinancialData>
+				<?php endforeach; ?>
 			<?php endif; 
 			if ($this->HasEmploymentExpenseData): ?>
 			<sfd:SelectedFinancialData>
@@ -403,10 +433,27 @@ EOS;
 	 * @param string $tag
 	 * @param string $value
 	 */
-	private function optElem( $tag, $value ) {
-		if (!empty($value)) echo "<".$tag.">".$value."</".$tag.">";
+	private function optElem( $tag, $value=NULL ) {
+		if (!empty($value)) $this->xmlElem($tag, $value, TRUE);
 	}
 
+	/**
+	 * Renders an elemnent
+	 * @param string $tag
+	 * @param string $value
+	 * @param boolean $value Optional or mandatory
+	 */
+	private function xmlElem( $tag, $value=NULL, $optional=FALSE ) {
+		$_tag = explode( ':', $tag );
+		if ( $_tag && count($_tag) > 1) $_tag = $_tag[1];
+		if ($value==NULL && isset($this->_data[$_tag]) ) {
+			$value = $this->_data[$_tag];
+		}
+		if ( $optional && empty($value)) return;
+		echo "<".$tag.">".htmlentities($value)."</".$tag.">";
+	}
+	
+	
 	/**
 	 * Renders SFD record
 	 * @param object  $sfdRow SFD entry DB row
@@ -416,77 +463,80 @@ EOS;
 	{
 		if ( $sfdRow->Data_Type=='REAL' ): ?>
 			<sfd:RealEstateRentalData>
-				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
-				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE;?></sfd:NAICSCode>
-				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
-				<sfd:FiscalPeriodEndDate><?php echo $sfdRow->FiscalPeriodeEndDate;?></sfd:FiscalPeriodEndDate>
-				<?php $this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber); ?>
-				<?php $this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber); ?>
-				<?php $this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent); ?>
-				<?php $this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator); ?>
-				<?php $this->createPartnerCoOwnerDataElement( $sfdRow); ?>
-				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['RealEstateRentalData']); ?>
+				<?php
+				$this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber);
+				$this->xmlElem('sfd:NAICSCode', $sfdRow->NAICSCODE);
+				$this->xmlElem('sfd:FiscalPeriodStartDate', $sfdRow->FiscalPeriodStartDate);
+				$this->xmlElem('sfd:FiscalPeriodEndDate', $sfdRow->FiscalPeriodeEndDate);
+				$this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber);
+				$this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber);
+				$this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent);
+				$this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator);
+				$this->createPartnerCoOwnerDataElement( $sfdRow);
+				$this->createReturnLines($returnLines, static::$_validSFDcodes['RealEstateRentalData']); ?>
 			</sfd:RealEstateRentalData>
 		<?php endif;
 		if ($sfdRow->Data_Type=='BUSINESS'): ?>
 			<sfd:BusinessActivityData>
-				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
-				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE;?></sfd:NAICSCode>
-				<sfd:BusinessName><?php echo htmlentities($sfdRow->BusinessName);?></sfd:BusinessName>
-				<?php $this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber); ?>
-				<?php $this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber); ?>
-				<?php $this->createBusinessAddressElement($sfdRow); ?>
-				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
-				<sfd:FiscalPeriodEndDate><?php echo $sfdRow->FiscalPeriodeEndDate;?></sfd:FiscalPeriodEndDate>
-				<?php $this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent); ?>
-				<?php $this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator); ?>
-				<?php $this->createPartnerCoOwnerDataElement( $sfdRow); ?>
-				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['BusinessActivityData']); ?>
+				<?php
+				$this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber);
+				$this->xmlElem('sfd:NAICSCode', $sfdRow->NAICSCODE);
+				$this->optElem("sfd:BusinessName", $sfdRow->BusinessName);
+				$this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber);
+				$this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber);
+				$this->createBusinessAddressElement($sfdRow);
+				$this->xmlElem('sfd:FiscalPeriodStartDate', $sfdRow->FiscalPeriodStartDate);
+				$this->xmlElem('sfd:FiscalPeriodEndDate', $sfdRow->FiscalPeriodeEndDate);
+				$this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent);
+				$this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator);
+				$this->createPartnerCoOwnerDataElement( $sfdRow);
+				$this->createReturnLines($returnLines, static::$_validSFDcodes['BusinessActivityData']); ?>
 			</sfd:BusinessActivityData>
 		<?php endif;
 		if ($sfdRow->Data_Type=='PROFESSIONAL'): ?>
 			<sfd:ProfessionalActivityData>
-				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
-				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE; ?></sfd:NAICSCode>
-				<sfd:BusinessName><?php echo htmlentities($sfdRow->BusinessName); ?></sfd:BusinessName>
-				<?php $this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber); ?>
-				<?php $this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber); ?>
-				<?php $this->createBusinessAddressElement($sfdRow); ?>
-				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
-				<sfd:FiscalPeriodEndDate><?php echo $sfdRow->FiscalPeriodeEndDate;?></sfd:FiscalPeriodEndDate>
-				<?php $this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent); ?>
-				<?php $this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator); ?>
-				<?php $this->createPartnerCoOwnerDataElement( $sfdRow); ?>
-				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['ProfessionalActivityData']); ?>
+				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber);
+				$this->xmlElem('sfd:NAICSCode', $sfdRow->NAICSCODE);
+				$this->optElem("sfd:BusinessName", $sfdRow->BusinessName);
+				$this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber);
+				$this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber);
+				$this->createBusinessAddressElement($sfdRow);
+				$this->xmlElem('sfd:FiscalPeriodStartDate', $sfdRow->FiscalPeriodStartDate);
+				$this->xmlElem('sfd:FiscalPeriodEndDate', $sfdRow->FiscalPeriodeEndDate);
+				$this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent);
+				$this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator);
+				$this->createPartnerCoOwnerDataElement( $sfdRow);
+				$this->createReturnLines($returnLines, static::$_validSFDcodes['ProfessionalActivityData']); ?>
 			</sfd:ProfessionalActivityData>
 		<?php endif;
 		if ($sfdRow->Data_Type=='FISHING'): ?>
 			<sfd:FishingActivityData>
-				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
-				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE; ?></sfd:NAICSCode>
-				<sfd:BoatName><?php echo htmlentities($sfdRow->BusinessName); ?></sfd:BoatName>
-				<?php $this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber); ?>
-				<?php $this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber); ?>
-				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
-				<sfd:FiscalPeriodEndDate><?php echo $sfdRow->FiscalPeriodeEndDate;?></sfd:FiscalPeriodEndDate>
-				<?php $this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent); ?>
-				<?php $this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator); ?>
-				<?php $this->createPartnerCoOwnerDataElement( $sfdRow); ?>
-				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['FishingActivityData']); ?>
+				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber);
+				$this->xmlElem('sfd:NAICSCode', $sfdRow->NAICSCODE);
+				$this->xmlElem('sfd:BoatName', $sfdRow->BusinessName);
+				$this->optElem("sfd:PartnershipNumber", $sfdRow->PartnershipNumber);
+				$this->optElem("sfd:TaxShelterNumber", $sfdRow->TaxShelterNumber);
+				$this->xmlElem('sfd:FiscalPeriodStartDate', $sfdRow->FiscalPeriodStartDate);
+				$this->xmlElem('sfd:FiscalPeriodEndDate', $sfdRow->FiscalPeriodeEndDate);
+				$this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent);
+				$this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator);
+				$this->createPartnerCoOwnerDataElement( $sfdRow);
+				$this->createReturnLines($returnLines, static::$_validSFDcodes['FishingActivityData']); ?>
 			</sfd:FishingActivityData>
 		<?php endif;
 		if ($sfdRow->Data_Type=='FARMING'):?>
 			<sfd:FarmingActivityData>
-				<sfd:AccountingMethodCode><?php echo $sfdRow->AccountingMethodCode; ?></sfd:AccountingMethodCode>
-				<?php $this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber); ?>
-				<sfd:NAICSCode><?php echo $sfdRow->NAICSCODE; ?></sfd:NAICSCode>
-				<sfd:FarmName><?php echo htmlentities($sfdRow->BusinessName); ?></sfd:FarmName>
-				<?php $this->createBusinessAddressElement($sfdRow); ?>
-				<sfd:FiscalPeriodStartDate><?php echo $sfdRow->FiscalPeriodStartDate;?></sfd:FiscalPeriodStartDate>
-				<sfd:FiscalPeriodEndDate><?php echo $sfdRow->FiscalPeriodeEndDate;?></sfd:FiscalPeriodEndDate>
-				<?php $this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent); ?>
-				<?php $this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator); ?>
-				<?php $this->createReturnLines($returnLines, static::$_validSFDcodes['FarmingActivityData']); ?>
+				<?php 
+				$this->xmlElem('sfd:AccountingMethodCode', $sfdRow->AccountingMethodCode);
+				$this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber);
+				$this->xmlElem('sfd:NAICSCode', $sfdRow->NAICSCODE);
+				$this->xmlElem('sfd:FarmName', $sfdRow->BusinessName);
+				$this->createBusinessAddressElement($sfdRow);
+				$this->xmlElem('sfd:FiscalPeriodStartDate', $sfdRow->FiscalPeriodStartDate);
+				$this->xmlElem('sfd:FiscalPeriodEndDate', $sfdRow->FiscalPeriodeEndDate);
+				$this->optElem("sfd:BusinessOwnershipPercent", $sfdRow->BusinessOwnershipPercent);
+				$this->optElem("sfd:FinalBusinessYearIndicator", $sfdRow->FinalBusinessYearIndicator);
+				$this->createReturnLines($returnLines, static::$_validSFDcodes['FarmingActivityData']); ?>
 			</sfd:FarmingActivityData>
 		<?php endif;
 	}
