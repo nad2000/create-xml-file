@@ -3,7 +3,7 @@
 /**
  * Data access component
  *
- * @author Rad Cirkis (nad2000@gmail.com)
+ * @author Rad Cirskis (nad2000@gmail.com)
  */
 class DataSource {
 

@@ -30,7 +30,7 @@ class Netfile{
 		'AddressProvinceCode',
 		'AddressStreetText',
 		'AlternateAddressAuthorizationCode',
-		'BoatName',
+	//'BoatName',
 		'BusinessAddressStreetText',
 		'BusinessName',
 		'BusinessOwnershipPercent',
@@ -215,7 +215,7 @@ EOS;
 	}
 
 
-		/**
+	/**
 	 * @param int $userId User ID
 	 * @param int $taxYear Tax Year
 	 * @return DOMDocument Validated XML document
