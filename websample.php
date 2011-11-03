@@ -98,7 +98,7 @@ if (!$nefile->isValid) { ?>
 	<?php
 	display_errors ($nefile->errors);
 	echo '<div style="border-width:.2em;border-style: dotted;border-color: #900;"><pre>';
-	echo xml_highlight($nefile->XML);
+	echo xml_highlight($nefile->Raw);
 	echo "</pre></div></body></html>";
 }
 else {
