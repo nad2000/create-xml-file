@@ -555,8 +555,9 @@ EOS;
 		if( isset($sfdRow->partners) ) foreach ( $sfdRow->partners as $p) { ?>
 				<sfd:PartnerCoOwnerData>
 					<sfd:PartnerName>
-						<comm:GivenName><?php echo $p->GivenName;?></comm:GivenName>
-						<comm:FamilyName><?php echo $p->FamilyName;?></comm:FamilyName>
+						<?php
+						$this->optElem('comm:GivenName', $p->GivenName);
+						$this->optElem('comm:FamilyName', $p->FamilyName);?>
 					</sfd:PartnerName>
 					<sfd:PartnerPIN><?php echo $p->PIN;?></sfd:PartnerPIN>
 					<sfd:PartnerBusinessOwnershipPercent><?php echo $p->OwnershipPercent;?></sfd:PartnerBusinessOwnershipPercent>
