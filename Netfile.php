@@ -382,7 +382,7 @@ EOS;
 			<t1:RelatedProgramData>
 				<?php
 				$this->xmlElem('t1:CanadianCitizenshipIndicator');
-				$this->xmlElem('t1:ElectionsCanadaAuthorizationIndicator');
+				$this->optElem('t1:ElectionsCanadaAuthorizationIndicator');
 				$this->xmlElem('t1:GSTHSTCreditApplicationIndicator');?>
 			</t1:RelatedProgramData>
 			<?php $this->createReturnLines($returnLines); ?>
