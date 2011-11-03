@@ -349,8 +349,8 @@ EOS;
 					<?php
 					$this->xmlElem('tp:SpouseSocialInsuranceNumber');
 					$this->optElem("tp:SpouseGivenName");
+					$this->optElem("tp:SpouseNetIncomeAmount"); 
 					$this->optElem("tp:SpouseUniversalChildCareBenefitAmount");
-					$this->optElem("tp:SpouseNetIncomeAmount");
 					$this->optElem("tp:SpouseUniversalChildCareRepaymentAmount"); ?>
 				</tp:TaxpayerSpouseData>
 				<?php endif; ?>
@@ -434,7 +434,7 @@ EOS;
 	 * @param string $value
 	 */
 	private function optElem( $tag, $value=NULL ) {
-		if (!empty($value)) $this->xmlElem($tag, $value, TRUE);
+	    $this->xmlElem($tag, $value, TRUE);
 	}
 
 	/**
@@ -444,10 +444,15 @@ EOS;
 	 * @param boolean $value Optional or mandatory
 	 */
 	private function xmlElem( $tag, $value=NULL, $optional=FALSE ) {
-		$_tag = explode( ':', $tag );
-		if ( $_tag && count($_tag) > 1) $_tag = $_tag[1];
-		if ($value==NULL && isset($this->_data[$_tag]) ) {
+		if ( $value==NULL )
+		{
+		    $_tag = explode( ':', $tag );
+		    if ( $_tag && count($_tag) > 1) $_tag = $_tag[1];
+		    if ( isset($this->_data[$_tag]) ) {
 			$value = $this->_data[$_tag];
+		    }
+		    else
+			$value = '';
 		}
 		if ( $optional && empty($value)) return;
 		echo "<$tag>".htmlentities($value)."</$tag>";
