@@ -20,6 +20,11 @@ class Netfile{
 	 */
 	const SoftwareRevisionDate='2011-08-06';
 
+	// Document generation phases:
+	const DOC_MAIN=1;
+	const DOC_SFD=2;
+
+
 	/**
 	 * @var arrary(string) Element list of elemts wiht values
 	 */
@@ -30,7 +35,6 @@ class Netfile{
 		'AddressProvinceCode',
 		'AddressStreetText',
 		'AlternateAddressAuthorizationCode',
-	//'BoatName',
 		'BusinessAddressStreetText',
 		'BusinessName',
 		'BusinessOwnershipPercent',
@@ -109,6 +113,11 @@ class Netfile{
 	);
 
 	/**
+	 * @var enum Document generation phase
+	 */
+	private $_phase = NULL;
+
+	/**
 	 * @var boolean XML vaidation indicato
 	 */
 	private $_isValid = TRUE;
@@ -116,7 +125,7 @@ class Netfile{
 	/**
 	 * @var array() Validation error messages
 	 */
-	private $_errors = NULL;
+	private $_errors = array();
 
 	/** @var DOMDocument XML DOM representation */
 	private $_xml = NULL;
@@ -150,7 +159,7 @@ class Netfile{
 		}
 		return FALSE;
 	}
-	
+
 	/**
 	 * Prints out ReturnLine element sequece
 	 * @param array() $returnLines Return lines
@@ -161,7 +170,7 @@ class Netfile{
 		foreach ( $returnLines as $line) {
 			if ( ( empty($validCodes) && $line->code >= 100 && $line->code <= 8000 )
 					|| ( isset ($validCodes) && in_array($line->code, $validCodes) )
-				) 
+				)
 			{
 				echo <<<EOS
 <comm:ReturnLine>
@@ -172,38 +181,38 @@ EOS;
 			}
 		}
 	}
-	
+
 	/**
 	 * Test if among return lines are rows for getHasEmploymentExpenseData
-	 * @return boolean 
+	 * @return boolean
 	 */
 	private function getHasEmploymentExpenseData() {
 		if( empty( $this->_hasEmploymentExpenseData) )
 			$this->_hasEmploymentExpenseData = $this->returnLinesHasCodes(
-					$this->_returnLines, 
-					static::$_validSFDcodes['EmploymentExpenseData']); 
+					$this->_returnLines,
+					static::$_validSFDcodes['EmploymentExpenseData']);
 		return $this->_hasEmploymentExpenseData;
 	}
 
 	/**
 	 * Test if among return lines are rows for MealLodgingExpenseData
-	 * @return boolean 
+	 * @return boolean
 	 */
 	private function getHasMealLodgingExpenseData() {
 		if( empty( $this->_hasMealLodgingExpenseData) )
 			$this->_hasMealLodgingExpenseData = $this->returnLinesHasCodes(
 					$this->_returnLines,
-					static::$_validSFDcodes['MealLodgingExpenseData']); 
+					static::$_validSFDcodes['MealLodgingExpenseData']);
 		return $this->_hasMealLodgingExpenseData;
 	}
-	
+
 	/**
 	 * Add validation error message to the error list
 	 * @param string $message validation message
 	 * @return errror object structuraly similar to XML validation error object
 	 */
 	private function addValidationError( $message) {
-		$err = (object)array( 
+		$err = (object)array(
 					'level' => 'VALIDATION',
 					'line' => 0,
 					'file' => '',
@@ -223,7 +232,7 @@ EOS;
 	public function createT1NetfileDoc(
 		$userId = 2,
 		$taxYear = 2010) {
-		
+
 		$this->_errors = array();
 
 		// default element values: ''
@@ -306,10 +315,11 @@ EOS;
 		$SFDRecordCount = count( $sfdData);
 		if ($this->HasEmploymentExpenseData) $SFDRecordCount++;
 		if ($this->HasMealLodgingExpenseData) $SFDRecordCount++;
-		
+
 		if ($SFDRecordCount > 6)
 			$this->addValidationError( "SFD records exceed maximum (6): $SFDRecordCount");
-		
+
+		$this->_phase = self::DOC_MAIN;
 		// generating teh document:
 		ob_start();
 		echo "<?xml version=\"1.0\"?>\n";
@@ -322,7 +332,7 @@ EOS;
 	xmlns:sfd="http://www.cra-arc.gc.ca/xmlns/sfd/2012/1-0-0"
 	xmlns:t1="http://www.cra-arc.gc.ca/xmlns/t1/2012/1-0-0"
 	xmlns:tp="http://www.cra-arc.gc.ca/xmlns/tp/2012/1-0-0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.cra-arc.gc.ca/xmlns/netfile/2012/1-0-0 xsd/netfile.xsd">
 	<net:T1Netfile>
 		<t1:T1Return>
@@ -330,7 +340,7 @@ EOS;
 			<comm:SoftwareRevisionDate><?php echo self::SoftwareRevisionDate;?></comm:SoftwareRevisionDate>
 			<t1:TaxpayerData>
 				<tp:TaxpayerBasicData>
-					<?php 
+					<?php
 					$this->xmlElem('tp:TaxpayerSocialInsuranceNumber');
 					$this->xmlElem('tp:TaxYear', $taxYear);
 					$this->xmlElem('tp:TaxpayerBirthDate');
@@ -349,14 +359,14 @@ EOS;
 					<?php
 					$this->xmlElem('tp:SpouseSocialInsuranceNumber');
 					$this->optElem("tp:SpouseGivenName");
-					$this->optElem("tp:SpouseNetIncomeAmount"); 
+					$this->optElem("tp:SpouseNetIncomeAmount");
 					$this->optElem("tp:SpouseUniversalChildCareBenefitAmount");
 					$this->optElem("tp:SpouseUniversalChildCareRepaymentAmount"); ?>
 				</tp:TaxpayerSpouseData>
 				<?php endif; ?>
 				<tp:TaxpayerContactData>
 					<comm:TaxpayerName>
-						<?php 
+						<?php
 						$this->xmlElem('comm:GivenName');
 						$this->xmlElem('comm:FamilyName');?>
 					</comm:TaxpayerName>
@@ -387,13 +397,14 @@ EOS;
 			</t1:RelatedProgramData>
 			<?php $this->createReturnLines($returnLines); ?>
 			<?php if ($SFDRecordCount > 0):
+				$this->_phase = self::DOC_SFD;
 				$this->xmlElem('t1:SelectedFinancialDataRecordCount', sprintf( "%02d", $SFDRecordCount));
 				foreach ($sfdData as $sfdRow): ?>
 					<sfd:SelectedFinancialData>
 						<?php $this->createSFDElement($sfdRow, $returnLines); ?>
 					</sfd:SelectedFinancialData>
 				<?php endforeach; ?>
-			<?php endif; 
+			<?php endif;
 			if ($this->HasEmploymentExpenseData): ?>
 			<sfd:SelectedFinancialData>
 				<sfd:EmploymentExpenseData>
@@ -427,7 +438,7 @@ EOS;
 
 	}
 
-	
+
 	/**
 	 * Renders an optional elemnent if the value is present (not empty)
 	 * @param string $tag
@@ -444,12 +455,14 @@ EOS;
 	 * @param boolean $value Optional or mandatory
 	 */
 	private function xmlElem( $tag, $value=NULL, $optional=FALSE ) {
-		if ( $value==NULL )
+		// For the main document part if the value is not supplied
+		// find amont the loaded elements:
+		if ( $value==NULL && $this->_phase==self::DOC_MAIN )
 		{
 		    $_tag = explode( ':', $tag );
 		    if ( $_tag && count($_tag) > 1) $_tag = $_tag[1];
 		    if ( isset($this->_data[$_tag]) ) {
-			$value = $this->_data[$_tag];
+				$value = $this->_data[$_tag];
 		    }
 		    else
 			$value = '';
@@ -457,8 +470,8 @@ EOS;
 		if ( $optional && empty($value)) return;
 		echo "<$tag>".htmlentities($value)."</$tag>";
 	}
-	
-	
+
+
 	/**
 	 * Renders SFD record
 	 * @param object  $sfdRow SFD entry DB row
@@ -531,7 +544,7 @@ EOS;
 		<?php endif;
 		if ($sfdRow->Data_Type=='FARMING'):?>
 			<sfd:FarmingActivityData>
-				<?php 
+				<?php
 				$this->xmlElem('sfd:AccountingMethodCode', $sfdRow->AccountingMethodCode);
 				$this->optElem("sfd:BusinessNumber", $sfdRow->BusinessNumber);
 				$this->xmlElem('sfd:NAICSCode', $sfdRow->NAICSCODE);
