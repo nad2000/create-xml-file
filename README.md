@@ -1,0 +1,7 @@
+﻿# Data extraction into XML for Canadian CRA in compliance with CRA XSD.
+
+## Scope:
+
+ - Mapping specification from one MySQL table (columns: id, user_id, tax_year, line_id, form_id, line_no, line_id_global, is_optimized, optimized_value, line_value, date_created	, date_updated) to XML (compliant with CRA XSD schema);
+
+ - utility / script (PHP5) for extracting MySQL DB data for aforementioned table into one XML document file in compliance with 7 XSD schemas.
