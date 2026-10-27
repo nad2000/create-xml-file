@@ -1,0 +1,1183 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xsd:schema xmlns:sfd="http://www.cra-arc.gc.ca/xmlns/sfd/2012/1-0-0" xmlns:sdt="http://www.cra-arc.gc.ca/xmlns/sdt/2-0-0" xmlns:comm="http://www.cra-arc.gc.ca/xmlns/comm/2012/1-0-0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.cra-arc.gc.ca/xmlns/sfd/2012/1-0-0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="sfd/2012/1-0-0">
+	<xsd:import namespace="http://www.cra-arc.gc.ca/xmlns/comm/2012/1-0-0" schemaLocation="electronicfilingcommon.xsd"/>
+	<xsd:import namespace="http://www.cra-arc.gc.ca/xmlns/sdt/2-0-0" schemaLocation="standarddatatypes.xsd"/>
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en"> sfd: Contains components referenced in individual income tax schema</xsd:documentation>
+		<xsd:documentation xml:lang="fr"> DFC: Contient les éléments cités en référence dans le schéma d'impôt sur le revenu des particuliers.</xsd:documentation>
+	</xsd:annotation>
+	<xsd:element name="FiscalPeriodStartDate" type="sdt:DateType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Format is YYYY-MM-DD</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Le format est AAAA-MM-JJ</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="FiscalPeriodEndDate" type="sdt:DateType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Format is YYYY-MM-DD</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Le format est AAAA-MM-JJ</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PartnershipNumber">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional if not applicable</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel si non applicable</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:NumberType">
+				<xsd:length value="9"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="BusinessOwnershipPercent">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional field. Allowed to omit if sole partnership</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Champ optionnel. Peut être omis si propriétaire unique</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:PercentType">
+				<xsd:pattern value="[0-9]{4}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="FinalBusinessYearIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional field shows if it is the final year of business. Values: 1 - Yes; 2 - No</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Champ optionnel: Indicateur si dernière année d'exploitation. Valeur: 1 - Oui; 2 - Non</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="BusinessNumber">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Client's Account Number.</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Numéro de compte du client.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:NumberType">
+				<xsd:length value="15"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="PartnerCoOwnerData" type="sfd:PartnerCoOwnerDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Could be from 0 up to 5 partners</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Peut être de 0 à 5 associés.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PartnerCoOwnerDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:PartnerName"/>
+			<xsd:element ref="sfd:PartnerPIN"/>
+			<xsd:element ref="sfd:PartnerBusinessOwnershipPercent"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PartnerName" type="comm:IndividualNameType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">If the partner or co-owner is a business, the name of the business is entered as the last name. If the partner name is the name of a business then enter it in the last name field.</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Si l'associé ou le copropriétaire est une entreprise, le nom de l'entreprise est entré comme nom de famille. Si le nom de l'associé est le nom d'une entreprise, le nom de l'entreprise est entré comme nom de famille.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PartnerPIN">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Default is zeros</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Les zéros sont par défaut.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:NumberType">
+				<xsd:minLength value="1"/>
+				<xsd:maxLength value="8"/>
+				<xsd:pattern value="[0-9]{1,8}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="PartnerBusinessOwnershipPercent">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Default is zeros</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Les zéros sont par défaut.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:PercentType">
+				<xsd:fractionDigits value="4"/>
+				<xsd:totalDigits value="6"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="NAICSCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Must be valid North American Industry Classification System Code from list provided</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Doit être un code valide du Système de Classification des Industries de l'Amérique du Nord(SCIAN) de la liste fournie.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="6"/>
+				<xsd:pattern value="[0-9]{6}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="BusinessName">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Can be any characters up to a maximum of 30 characters. An Empty field is valid as well.</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Peut être n'importe quel caractère jusqu'à un maximum de 30. Un champ vide est valide également.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:simpleContent>
+				<xsd:restriction base="sfd:BusinessNameType"/>
+			</xsd:simpleContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="BusinessNameType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Business, boat or farm name.</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Entreprise, bateau ou nom de la ferme.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="sdt:NameType">
+				<xsd:maxLength value="30"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:element name="BusinessAddress" type="sfd:BusinessAddressType"/>
+	<xsd:complexType name="BusinessAddressType">
+		<xsd:sequence>
+			<xsd:element ref="comm:BusinessAddressStreetText"/>
+			<xsd:element ref="comm:AddressPostalCode"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="TaxShelterNumber">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:NumberType">
+				<xsd:length value="8"/>
+				<xsd:pattern value="[A-Za-z]{2}[0-9]{6}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="SelectedFinancialData" type="sfd:SelectedFinancialDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">There can be from 0 to 6 SFDs in each return out of 9 available types</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Il peut avoir de 0 à 6 DFC pour chaque déclaration avec un choix  de 9 types disponibles</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SelectedFinancialDataType">
+		<xsd:choice>
+			<xsd:element ref="sfd:RealEstateRentalData"/>
+			<xsd:element ref="sfd:BusinessActivityData"/>
+			<xsd:element ref="sfd:ProfessionalActivityData"/>
+			<xsd:element ref="sfd:FishingActivityData"/>
+			<xsd:element ref="sfd:FarmingActivityData"/>
+			<xsd:element ref="sfd:AgriStabilityAgriInvestProgramFarmingData"/>
+			<xsd:element ref="sfd:EmploymentExpenseData"/>
+			<xsd:element ref="sfd:MealLodgingExpenseData"/>
+			<xsd:element ref="sfd:AgriStabilityAgriInvestProgramHarmonizedData"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:element name="RealEstateRentalData" type="sfd:RealEstateRentalDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en"> SFD1 T776 </xsd:documentation>
+			<xsd:documentation xml:lang="fr"> DFC1 T776 </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="RealEstateRentalDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:BusinessNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:NAICSCode"/>
+			<xsd:element ref="sfd:FiscalPeriodStartDate"/>
+			<xsd:element ref="sfd:FiscalPeriodEndDate"/>
+			<xsd:element ref="sfd:PartnershipNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:TaxShelterNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:BusinessOwnershipPercent" minOccurs="0"/>
+			<xsd:element ref="sfd:FinalBusinessYearIndicator" minOccurs="0"/>
+			<xsd:element ref="sfd:PartnerCoOwnerData" minOccurs="0" maxOccurs="5"/>
+			<xsd:element ref="comm:ReturnLine" maxOccurs="90"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="BusinessActivityData" type="sfd:BusinessActivityDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en"> SFD2 T2125 </xsd:documentation>
+			<xsd:documentation xml:lang="fr"> DFC2 T2125 </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="BusinessActivityDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:BusinessNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:NAICSCode"/>
+			<xsd:element ref="sfd:BusinessName"/>
+			<xsd:element ref="sfd:PartnershipNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:TaxShelterNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:BusinessAddress" minOccurs="0"/>
+			<xsd:element ref="sfd:FiscalPeriodStartDate"/>
+			<xsd:element ref="sfd:FiscalPeriodEndDate"/>
+			<xsd:element ref="sfd:BusinessOwnershipPercent" minOccurs="0"/>
+			<xsd:element ref="sfd:FinalBusinessYearIndicator" minOccurs="0"/>
+			<xsd:element ref="sfd:PartnerCoOwnerData" minOccurs="0" maxOccurs="5"/>
+			<xsd:element ref="comm:ReturnLine" maxOccurs="90"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ProfessionalActivityData" type="sfd:ProfessionalActivityDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en"> SFD3 T2125 </xsd:documentation>
+			<xsd:documentation xml:lang="fr"> DFC3 T2125 </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProfessionalActivityDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:BusinessNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:NAICSCode"/>
+			<xsd:element ref="sfd:BusinessName"/>
+			<xsd:element ref="sfd:PartnershipNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:TaxShelterNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:BusinessAddress" minOccurs="0"/>
+			<xsd:element ref="sfd:FiscalPeriodStartDate"/>
+			<xsd:element ref="sfd:FiscalPeriodEndDate"/>
+			<xsd:element ref="sfd:BusinessOwnershipPercent" minOccurs="0"/>
+			<xsd:element ref="sfd:FinalBusinessYearIndicator" minOccurs="0"/>
+			<xsd:element ref="sfd:PartnerCoOwnerData" minOccurs="0" maxOccurs="5"/>
+			<xsd:element ref="comm:ReturnLine" maxOccurs="90"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="FishingActivityData" type="sfd:FishingActivityDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en"> SFD4 T2121 </xsd:documentation>
+			<xsd:documentation xml:lang="fr"> DFC4 T2121 </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="FishingActivityDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:BusinessNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:NAICSCode"/>
+			<xsd:element ref="sfd:BoatName"/>
+			<xsd:element ref="sfd:PartnershipNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:TaxShelterNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:FiscalPeriodStartDate"/>
+			<xsd:element ref="sfd:FiscalPeriodEndDate"/>
+			<xsd:element ref="sfd:BusinessOwnershipPercent" minOccurs="0"/>
+			<xsd:element ref="sfd:FinalBusinessYearIndicator" minOccurs="0"/>
+			<xsd:element ref="sfd:PartnerCoOwnerData" minOccurs="0" maxOccurs="5"/>
+			<xsd:element ref="comm:ReturnLine" maxOccurs="90"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="BoatName">
+		<xsd:complexType>
+			<xsd:simpleContent>
+				<xsd:restriction base="sfd:BusinessNameType"/>
+			</xsd:simpleContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="FarmingActivityData" type="sfd:FarmingActivityDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en"> SFD5 T2042 </xsd:documentation>
+			<xsd:documentation xml:lang="fr"> DFC5 T2042 </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="FarmingActivityDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:AccountingMethodCode"/>
+			<xsd:element ref="sfd:BusinessNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:NAICSCode"/>
+			<xsd:element ref="sfd:FarmName"/>
+			<xsd:element ref="sfd:PartnershipNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:FarmAddress" minOccurs="0"/>
+			<xsd:element ref="sfd:FiscalPeriodStartDate"/>
+			<xsd:element ref="sfd:FiscalPeriodEndDate"/>
+			<xsd:element ref="sfd:BusinessOwnershipPercent" minOccurs="0"/>
+			<xsd:element ref="sfd:FinalBusinessYearIndicator" minOccurs="0"/>
+			<xsd:element ref="sfd:PartnerCoOwnerData" minOccurs="0" maxOccurs="5"/>
+			<xsd:element ref="comm:ReturnLine" maxOccurs="90"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="FarmName">
+		<xsd:complexType>
+			<xsd:simpleContent>
+				<xsd:restriction base="sfd:BusinessNameType"/>
+			</xsd:simpleContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="FarmAddress" type="sfd:BusinessAddressType"/>
+	<xsd:element name="AccountingMethodCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">1 - Accrual; 2 - Cash</xsd:documentation>
+			<xsd:documentation xml:lang="fr">1 - Exercice; 2 - Caisse</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="AgriStabilityAgriInvestProgramFarmingData" type="sfd:AgriStabilityAgriInvestProgramFarmingDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en"> SFD6: T1163 + T1273</xsd:documentation>
+			<xsd:documentation xml:lang="fr"> DFC6: T1163 + T1273</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AgriStabilityAgriInvestProgramFarmingDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:MainFarmsteadProvinceCode"/>
+			<xsd:element ref="sfd:AccountingMethodCode"/>
+			<xsd:element ref="sfd:NAICSCode"/>
+			<xsd:element ref="sfd:FarmName"/>
+			<xsd:element ref="sfd:PartnershipNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:FarmAddress" minOccurs="0"/>
+			<xsd:element ref="sfd:ClientEveningTelephoneNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:ClientFaxNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:FeederAssociationMemberIndicator"/>
+			<xsd:element ref="sfd:LandlordCropShareIndicator"/>
+			<xsd:element ref="sfd:TenantCropShareIndicator"/>
+			<xsd:element ref="sfd:FiscalPeriodStartDate"/>
+			<xsd:element ref="sfd:FiscalPeriodEndDate"/>
+			<xsd:element ref="sfd:AgriStabilityAgriInvestProgramBusinessTypeCode"/>
+			<xsd:element ref="sfd:BusinessOwnershipPercent" minOccurs="0"/>
+			<xsd:element ref="sfd:FinalBusinessYearIndicator" minOccurs="0"/>
+			<xsd:element ref="sfd:PartnerCoOwnerData" minOccurs="0" maxOccurs="5"/>
+			<xsd:element ref="sfd:ContactData" minOccurs="0"/>
+			<xsd:element ref="sfd:FarmedYearCount"/>
+			<xsd:element ref="sfd:AgriStabilityAgriInvestProgramParticipantIDNumber"/>
+			<xsd:element ref="sfd:PublicOfficeAAFCEmployeeIndicator" minOccurs="0"/>
+			<xsd:element ref="sfd:DistrictCountyMunicipalityName" minOccurs="0"/>
+			<xsd:element ref="sfd:DistrictCountyMunicipalityNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:LegalLandDescription" minOccurs="0"/>
+			<xsd:element ref="sfd:CanadianWheatBoardAdjustmentWorksheetIndicator" minOccurs="0"/>
+			<xsd:element ref="sfd:ReceiptsIndicator" minOccurs="0"/>
+			<xsd:element ref="sfd:OtherCorrespondenceIndicator" minOccurs="0"/>
+			<xsd:element ref="sfd:OtherCorrespondenceText" minOccurs="0"/>
+			<xsd:element ref="sfd:CombinedFarmOperationData" minOccurs="0"/>
+			<xsd:element ref="sfd:ProductionCycleCompletionIndicator"/>
+			<xsd:element ref="sfd:ProductionCycleDisasterIndicator" minOccurs="0"/>
+			<xsd:element ref="sfd:CommodityTotalReturnLine" minOccurs="0" maxOccurs="2"/>
+			<xsd:element ref="comm:ReturnLine" maxOccurs="90"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="MainFarmsteadProvinceCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Possible choices: NL, PE, NS, NB, QC, ON, MB, SK, AB, BC, YT, NU, NT</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Choix possibles: NL, PE, NS, NB, QC, ON, MB, SK, AB, BC, YT, NU, NT</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="comm:CanadianProvinceCodeType">
+				<xsd:length value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="ClientEveningTelephoneNumber" type="comm:NorthAmericanTelephoneNumberType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ClientFaxNumber" type="comm:NorthAmericanTelephoneNumberType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="FeederAssociationMemberIndicator" type="sdt:IndicatorType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Type of Farming Operation - Member of Feeder Association. Valid values are: 0 for "No" (default populated by software), 1 for " Yes"</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Genre d'entreprise agricole - Membre d'une association d'exploitants de parc d'engraissement. Les valeurs valides sont: 0 pour "Non" (valeur par défaut peuplé par le logiciel), 1 pour "Oui"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="LandlordCropShareIndicator" type="sdt:IndicatorType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Type of Farming Operation - Landlord (Crop-Share). Valid values are: 0 for "No" (default populated by software), 1 for " Yes"</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Genre d'entreprise agricole - Propriétaire foncier (revenu de métayage). Les valeurs valides sont: 0 pour "Non" (valeur par défaut peuplé par le logiciel), 1 pour "Oui"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="TenantCropShareIndicator" type="sdt:IndicatorType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Type of Farming Business - Tenant (Crop Share). Valid Values: 0 = No (default populated by software), 1 = Yes</xsd:documentation>
+			<xsd:documentation xml:lang="fr"> Genre d'entreprise agricole - Locataire (revenu de métayage). Les valeurs valides sont: 0 pour "Non" (valeur par défaut peuplé par le logiciel), 1 pour "Oui"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="AgriStabilityAgriInvestProgramBusinessTypeCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Valid values:  1 = sole proprietorship, 2 = partnership</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Valeurs valides:  1 = propriétaire unique, 2 = société de personnes</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="ContactData" type="sfd:ContactDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ContactDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:ContactPersonIndicator" minOccurs="0"/>
+			<xsd:element ref="sfd:ContactName" minOccurs="0"/>
+			<xsd:element ref="sfd:ContactBusinessName" minOccurs="0"/>
+			<xsd:element ref="sfd:ContactAddress" minOccurs="0"/>
+			<xsd:element ref="sfd:ContactTelephoneNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:ContactFaxNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:CalculationOfBenefitsContactCopyIndicator" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ContactPersonIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional. Authorization to contact. Valid values are 1 for "YES", 2 for "NO" (default if omitted)</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel. Autorisation à contacter. Les valeurs valides sont 1 pour "OUI", 2 pour "NON" (Défaut si omis)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="ContactName" type="comm:IndividualNameType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ContactBusinessName">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:simpleContent>
+				<xsd:restriction base="sfd:BusinessNameType"/>
+			</xsd:simpleContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ContactAddress" type="comm:ContactAddressType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ContactTelephoneNumber" type="comm:NorthAmericanTelephoneNumberType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ContactFaxNumber" type="comm:NorthAmericanTelephoneNumberType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="CalculationOfBenefitsContactCopyIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional. Send Calculation of Program Benefits to Contact Indicator. Valid values are 1 for "YES", 2 for "NO" (default if omitted)</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel. Indicateur pour envoyer une copie du calcul des avantages du programme à la personne-ressource. Les valeurs valides sont 1 pour "OUI", 2 pour "NON" (Défaut si omis)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/> 
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="FarmedYearCount">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Number of Years Farmed. default zeros. entered as 01, 02  etc.</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Nombre d'années de participation dans une entreprise agricole. Les zéros sont par défaut. Entrer comme suit 01, 02, etc.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CountType">
+				<xsd:pattern value="[0-9]{1,2}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="AgriStabilityAgriInvestProgramParticipantIDNumber">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">AgriStability and AgriInvest Participant Identification Number (PIN). No default value populated by the software, 8 zeros and blank is not acceptable.</xsd:documentation>
+			<xsd:documentation xml:lang="fr"> NIP du client aux programmes Agri-stabilité et Agri-investissement. Aucune valeur par défaut peuplée par le logiciel, huit zéros et des espaces ne sont pas acceptées.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:NumberType">
+				<xsd:length value="8"/>
+				<xsd:pattern value="[0-9]{8}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="PublicOfficeAAFCEmployeeIndicator" default="2">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Current or former federal public office holder or employee of Agriculture and Agri-Food Canada. Mandatory if Type 9 SFD is transmitted together with this (Type 6) SFD and optional if only this (Type 6) SFD is transmitted. Valid values are 1 for "YES", 2 for "NO" (default if field is omitted)</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Titulaire de charge publique ou un employé d'Agriculture et Agroalimentaire Canada. Obligatoire si le DFC9 est transmis avec le DFC6 et optionnel si seulement le DFC6 est transmis. Les valeurs valides sont 1 pour "OUI", 2 pour "NON" (Défaut si le champ est omis)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="DistrictCountyMunicipalityName">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Rural municipality or district/county name. Mandatory if Type 9 SFD is transmitted together with this (Type 6) SFD and optional if only this (Type 6) SFD is transmitted. </xsd:documentation>
+			<xsd:documentation xml:lang="fr">Nom de la municipalité rurale ou du district/comté. Obligatoire si le DFC9 est transmis avec le DFC6 et optionnel si seulement le DFC6 est transmis. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:simpleContent>
+				<xsd:restriction base="sdt:NameType">
+					<xsd:maxLength value="24"/>
+				</xsd:restriction>
+			</xsd:simpleContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="DistrictCountyMunicipalityNumber" default="000">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Rural municipality or district/county number. Mandatory if Type 9 SFD is transmitted together with this (Type 6) SFD and optional if only this (Type 6) SFD is transmitted. </xsd:documentation>
+			<xsd:documentation xml:lang="fr">Numéro de la municipalité rurale ou du district/comté. Obligatoire si le DFC9 est transmis avec le DFC6 et optionnel si seulement le DFC6 est transmis. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:NumberType">
+				<xsd:length value="3"/>
+				<xsd:pattern value="[0-9]{3}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="LegalLandDescription" type="sfd:LegalLandDescriptionType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Mandatory Group if Type 9 SFD is transmitted together with this (Type 6) SFD and optional group if only this (Type 6) SFD is transmitted. </xsd:documentation>
+			<xsd:documentation xml:lang="fr">Obligatoire si le DFC9 est transmis avec le DFC6 et optionnel si seulement le DFC6 est transmis. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="LegalLandDescriptionType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:LegalLandDescriptionQuarterNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:LegalLandDescriptionSectionNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:LegalLandDescriptionTownshipNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:LegalLandDescriptionRangeNumber" minOccurs="0"/>
+			<xsd:element ref="sfd:LegalLandDescriptionMeridianNumber" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="LegalLandDescriptionQuarterNumber">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional. If omitted, defaults to "00"</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel. Si omis. défault à "00"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:NumberType">
+				<xsd:length value="2"/>
+				<xsd:pattern value="[A-Za-z0-9]{2}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="LegalLandDescriptionSectionNumber">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional. If omitted, defaults to "00"</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel. Si omis. défault à "00"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:NumberType">
+				<xsd:length value="2"/>
+				<xsd:pattern value="[A-Za-z0-9]{2}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="LegalLandDescriptionTownshipNumber">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional. If omitted, defaults to "00"</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel. Si omis. défault à "00"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:NumberType">
+				<xsd:length value="2"/>
+				<xsd:pattern value="[A-Za-z0-9]{2}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="LegalLandDescriptionRangeNumber">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional. If omitted, defaults to "00"</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel. Si omis. défault à "00"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:NumberType">
+				<xsd:length value="2"/>
+				<xsd:pattern value="[A-Za-z0-9]{2}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="LegalLandDescriptionMeridianNumber">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Optional. If omitted, defaults to "00"</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Optionnel. Si omis. défault à "00"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:NumberType">
+				<xsd:length value="2"/>
+				<xsd:pattern value="[A-Za-z0-9]{2}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="CanadianWheatBoardAdjustmentWorksheetIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Sending CWBA Worksheet form. Mandatory if Type 9 SFD is transmitted together with this (Type 6) SFD and optional if only this (Type 6) SFD is transmitted. Valid values are 1 for "YES", 2 for "NO" (default if field is omitted)</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Envoi de la feuille de calcul de rajustement des comptes débiteurs de la CCB. Obligatoire si le DFC9 est transmis avec le DFC6 et optionnel si seulement le DFC6 est transmis. Les valeurs valides sont 1 pour "OUI", 2 pour "NON" (Défaut si le champ est omis)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="ReceiptsIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Sending Receipts. Mandatory if Type 9 SFD is transmitted together with this (Type 6) SFD and optional if only this (Type 6) SFD is transmitted. Valid values are 1 for "YES", 2 for "NO" (default if field is omitted)</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Envoi des reçus. Obligatoire si le DFC9 est transmis avec le DFC6 et optionnel si seulement le DFC6 est transmis. Les valeurs valides sont 1 pour "OUI", 2 pour "NON" (Défaut si le champ est omis)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="OtherCorrespondenceIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Sending Other Correspondence. Mandatory if Type 9 SFD is transmitted together with this (Type 6) SFD and optional if only this (Type 6) SFD is transmitted. Valid values are 1 for "YES", 2 for "NO" (default if field is omitted)</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Envoi pour autre correspondance. Obligatoire si le DFC9 est transmis avec le DFC6 et optionnel si seulement le DFC6 est transmis. Les valeurs valides sont 1 pour "OUI", 2 pour "NON" (Défaut si le champs est omis)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="OtherCorrespondenceText">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Specify correspondence. Mandatory if Type 9 SFD is transmitted together with this (Type 6) SFD and optional if only this (Type 6) SFD is transmitted. </xsd:documentation>
+			<xsd:documentation xml:lang="fr">Autre correspondance précisée. Obligatoire si le DFC9 est transmis avec le DFC6 et optionnel si seulement le DFC6 est transmis.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:simpleContent>
+				<xsd:restriction base="sdt:TextType">
+					<xsd:maxLength value="50"/>
+				</xsd:restriction>
+			</xsd:simpleContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="CombinedFarmOperationData" type="sfd:CombinedFarmOperationDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Mandatory Group if Type 9 SFD is transmitted together with this (Type 6) SFD and optional group if only this (Type 6) SFD is transmitted. </xsd:documentation>
+			<xsd:documentation xml:lang="fr">Obligatoire si le DFC9 est transmis avec le DFC6 et optionnel si seulement le DFC6 est transmis. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CombinedFarmOperationDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:CombinedFarmOperationIndicator"/>
+			<xsd:element ref="sfd:CombinedFarmOperationChange" minOccurs="0" maxOccurs="4"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CombinedFarmOperationIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Valid values are 1 for "YES", 2 for "NO"</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Les valeurs valides sont 1 pour "Oui", 2 pour "Non"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="CombinedFarmOperationChange" type="sfd:CombinedFarmOperationChangeType"/>
+	<xsd:complexType name="CombinedFarmOperationChangeType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:CombinedFarmOperationPIN"/>
+			<xsd:element ref="sfd:CombinedFarmOperationChangeCode"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CombinedFarmOperationPIN">
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:NumberType">
+				<xsd:length value="8"/>
+				<xsd:pattern value="[0-9]{8}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="CombinedFarmOperationChangeCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">1=Add, 2=Remove</xsd:documentation>
+			<xsd:documentation xml:lang="fr">1=Ajouter, 2=Supprimer</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="ProductionCycleCompletionIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Production cycle completed indicator. Valid values are 1 for "YES", 2 for "NO"</xsd:documentation>
+			<xsd:documentation xml:lang="fr"> Indicateur du cycle de production exécuté. Les valeurs valides sont 1 for "Oui", 2 pour "Non"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="ProductionCycleDisasterIndicator">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Unable to complete Production cycle due to disaster indicator. Optional field. Valid values are 1 for "YES", 2 for "NO" (default if element is omitted). </xsd:documentation>
+			<xsd:documentation xml:lang="fr">N'est pas en mesure d'exécuter un cycle de production en raison de circonstances catastrophiques. Champ optionnel. Les valeurs valides sont 1 pour "OUI", 2 pour "NON" (défaut si l'élément est omis). </xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="CommodityTotalReturnLine" type="sfd:CommodityTotalReturnLineType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Occurs 0 to 2 Times - 1st occur for Income, 2nd occur for Expenses</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Se produit de 0 à 2 fois - la première occurrence pour le revenu, la deuxième occurrence pour les dépenses</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CommodityTotalReturnLineType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:CommodityTotalFieldCode"/>
+			<xsd:element ref="sfd:FieldAmount"/>
+			<xsd:element ref="sfd:Commodity" minOccurs="0" maxOccurs="29"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CommodityTotalFieldCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Valid values are '9950' - Income and '9960' - Expense</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Les valeurs valides sont '9950' - Revenu et '9960' - Dépenses</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="4"/>
+				<xsd:enumeration value="9950"/>
+				<xsd:enumeration value="9960"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="FieldAmount">
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:AmountDollarsOnlyType">
+				<xsd:pattern value="[0-9]{1,9}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="Commodity" type="sfd:CommodityType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Occurs 0 to 29 Times. (There are 29 lines for entering commodity codes/amounts in form T1273)</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Se produit de 0 à 29 fois. (Il y a 29 lignes pour enregistrer les codes de commodité/montants dans le formulaire T1273)</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CommodityType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:CommodityCode"/>
+			<xsd:element ref="sfd:CommodityAmount"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CommodityCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Reference: Listing  of Commodity Sales and Program Payments section (section 4) of the harmonized form. </xsd:documentation>
+			<xsd:documentation xml:lang="fr">Référence: Liste des produits et paiements provenant de programmes (section 4) du formulaire harmonisé.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="3"/>
+				<xsd:pattern value="[0-9]{3}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="CommodityAmount">
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:AmountDollarsOnlyType">
+				<xsd:pattern value="[0-9]{1,9}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="EmploymentExpenseData" type="sfd:EmploymentExpenseDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en"> SFD7: T777 </xsd:documentation>
+			<xsd:documentation xml:lang="fr"> DFC7: T777 </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="EmploymentExpenseDataType">
+		<xsd:sequence>
+			<xsd:element ref="comm:ReturnLine" maxOccurs="90"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="MealLodgingExpenseData" type="sfd:MealLodgingExpenseDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en"> SFD8: TL2 </xsd:documentation>
+			<xsd:documentation xml:lang="fr"> DFC8: TL2 </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="MealLodgingExpenseDataType">
+		<xsd:sequence>
+			<xsd:element ref="comm:ReturnLine" maxOccurs="90"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="AgriStabilityAgriInvestProgramHarmonizedData" type="sfd:AgriStabilityAgriInvestProgramHarmonizedDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en"> SFD9: T1273 p1+7 </xsd:documentation>
+			<xsd:documentation xml:lang="fr"> DFC9: T1273 p1+7 </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AgriStabilityAgriInvestProgramHarmonizedDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:FarmingOperationData"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="FarmingOperationData" type="sfd:FarmingOperationDataType"/>
+	<xsd:complexType name="FarmingOperationDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">T1273 Statement A</xsd:documentation>
+			<xsd:documentation xml:lang="fr">T1273 État A</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="sfd:CropDisasterIndicator"/>
+			<xsd:element ref="sfd:LivestockDisasterIndicator"/>
+			<xsd:element ref="sfd:ProductionInsuranceContractNumber" minOccurs="0" maxOccurs="6"/>
+			<xsd:element ref="sfd:CropInventoryValuationData" minOccurs="0" maxOccurs="50"/>
+			<xsd:element ref="sfd:CropFixedData" minOccurs="0" maxOccurs="4"/>
+			<xsd:element ref="sfd:LivestockInventoryValuationData" minOccurs="0" maxOccurs="50"/>
+			<xsd:element ref="sfd:LivestockProductiveCapacityData" minOccurs="0" maxOccurs="19"/>
+			<xsd:element ref="sfd:PurchasedInputData" minOccurs="0" maxOccurs="8"/>
+			<xsd:element ref="sfd:DeferredIncomeReceivableData" minOccurs="0" maxOccurs="8"/>
+			<xsd:element ref="sfd:AccountsPayableData" minOccurs="0" maxOccurs="8"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CropDisasterIndicator" default="2">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Valid values are 1 for "YES", 2 for "NO" (default). Has the crop productive capacity of this operation decreased during the program year due to disaster circumstances?</xsd:documentation>
+			<xsd:documentation xml:lang="fr"> Les valeurs valides sont 1 pour "OUI", 2 pour "NON" (défault). La capacité de production de l'exploitation a-t-elle diminué au cours de l'année de programme en raison d'une catastrophe?</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="LivestockDisasterIndicator" default="2">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Valid values are 1 for "YES", 2 for "NO" (default). Has the livestock productive capacity of this operation decreased during the program year due to disaster circumstances?</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Les valeurs valides sont 1 pour "OUI", 2 pour "NON" (défault). La capacité de production de cultures de l'exploitation a-t-elle diminué au cours de l'année de programme en raison d'une  catastrophe?</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="1"/>
+				<xsd:enumeration value="1"/>
+				<xsd:enumeration value="2"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="ProductionInsuranceContractNumber">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">OCCURS 0 to 6 TIMES. If the taxpayer participated in production (crop) insurance in the program year for this operation, please provide the Contract or Identification numbers.</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Se produit de 0 à 6 fois. Si le contribuable a participé au programme d'assurance-production ou d'assurance-récolte au cours de l'année de programme, SVP inscrire les numéros de contrat ou d'identification.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:IDType">
+				<xsd:maxLength value="12"/>
+				<xsd:minLength value="1"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="LivestockInventoryValuationData" type="sfd:LivestockInventoryValuationDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Occurs 0 to 50 for EOLP and 0 to 10 for EOL and NETFILE </xsd:documentation>
+			<xsd:documentation xml:lang="fr">Se produit de 0 à 50 pour TED Plus et 0 à 10 pour TED en direct et IMPÔTNET </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="LivestockInventoryValuationDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:LivestockTypeCode"/>
+			<xsd:element ref="sfd:LivestockYearEndQuantity"/>
+			<xsd:element ref="sfd:LivestockYearEndPriceAmount"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="LivestockTypeCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">For LivestockInventoryValuationData: use 4 digit code. For LivestockProductiveCapacityData: use 3 digit code except for default code 4005</xsd:documentation>
+			<xsd:documentation xml:lang="fr"> Pour LivestockInventoryValuationData: Utilisé un code de 4 chiffres. Pour LivestockProductiveCapacityData: Utilisé un code de 3 chiffres à l'exception du code par défaut 4005.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:maxLength value="4"/>
+				<xsd:minLength value="1"/>
+				<xsd:pattern value="[0-9]{1,4}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="LivestockYearEndQuantity">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Livestock Year End Inventory</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Stocks de fin Valeur du bétail</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:QuantityType">
+				<xsd:pattern value="[0-9]{1,15}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="LivestockYearEndPriceAmount">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Year end price of livestock</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Prix de fin d'année du bétail</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:AmountDollarsOnlyType">
+				<xsd:pattern value="[0-9]{1,15}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="CropInventoryValuationData" type="sfd:CropInventoryValuationDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Occurs 0 to 50 for EOLP and 0 to 10 for EOL and NETFILE </xsd:documentation>
+			<xsd:documentation xml:lang="fr">Se produit de 0 à 50 pour TED Plus et 0 à 10 pour TED en direct et IMPÔTNET </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CropInventoryValuationDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:CropTypeCode"/>
+			<xsd:element ref="sfd:CropMeasurementUnitCode"/>
+			<xsd:element ref="sfd:CropAcreQuantity"/>
+			<xsd:element ref="sfd:CropProducedQuantity"/>
+			<xsd:element ref="sfd:CropYearEndQuantity"/>
+			<xsd:element ref="sfd:CropYearEndPriceAmount"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CropTypeCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">For CropFixedData: 16 - Unseedable Acres (too wet/too dry); 17 - Summerfallow Acres; 18 - Pasture Acres; 19 - Wasteland Acres. For CropInventoryValuationData: use 4 digit code</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Pour CropFixedData: 16 - Acres non ensemençables (trop humides ou trop secs); 17 - Acres en jachère; 18 - Acres de pâturage; 19 - Acres inutilisables. Pour CropInventoryValuationData: utilisé un code de 4 chiffres</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:maxLength value="4"/>
+				<xsd:minLength value="1"/>
+				<xsd:pattern value="[0-9]{1,4}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="CropMeasurementUnitCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">01 - Pounds; 02 - Tonnes; 04 - Bushels; 05 - Kilograms; 07 - Small Bales; 08 - Large Bales; 10 - Litres; 16 - CWT; 64 - Other</xsd:documentation>
+			<xsd:documentation xml:lang="fr">01 - Livres; 02 - Tonnes; 04 - Boisseaux; 05 - Kilogrammes; 07 - Petites balles; 08 - Grandes balles; 10 - Litres; 16 - Quintales; 64 - Autre</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:length value="2"/>
+				<xsd:pattern value="[0-9]{2}"/>
+				<xsd:enumeration value="01"/>
+				<xsd:enumeration value="02"/>
+				<xsd:enumeration value="04"/>
+				<xsd:enumeration value="05"/>
+				<xsd:enumeration value="07"/>
+				<xsd:enumeration value="08"/>
+				<xsd:enumeration value="10"/>
+				<xsd:enumeration value="16"/>
+				<xsd:enumeration value="64"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="CropAcreQuantity">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Number of acres used for a crop</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Nombre d'acres utilisés pour une culture</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:QuantityType">
+				<xsd:pattern value="[0-9]{1,15}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="CropProducedQuantity">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Quantity of crop produced</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Quantité produite</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:QuantityType">
+				<xsd:pattern value="[0-9]{1,15}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="CropYearEndQuantity">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Year end inventory of crop</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Stocks de fin d'inventaire des cultures</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:QuantityType">
+				<xsd:pattern value="[0-9]{1,15}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="CropYearEndPriceAmount">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Year end price of crop</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Prix de fin d'année des cultures</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:AmountDollarsOnlyType">
+				<xsd:pattern value="[0-9]{1,15}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="CropFixedData" type="sfd:CropFixedDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Occurs 0 to 4 times</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Se produit de 0 à 4 fois</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CropFixedDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:CropTypeCode"/>
+			<xsd:element ref="sfd:CropAcreQuantity"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="LivestockProductiveCapacityData" type="sfd:LivestockProductiveCapacityDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="em">Occurs 0 to 19 times</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Se produit de 0 à 19 fois</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="LivestockProductiveCapacityDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:LivestockTypeCode"/>
+			<xsd:element ref="sfd:LivestockQuantity"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="LivestockQuantity">
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:QuantityType">
+				<xsd:pattern value="[0-9]{1,15}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="PurchasedInputData" type="sfd:PurchasedInputDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Occurs 0 to 8 times</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Se produit de 0 à 8 fois</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PurchasedInputDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:PurchasedInputTypeCode"/>
+			<xsd:element ref="sfd:PurchasedInputYearEndAmount"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PurchasedInputTypeCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">1 to 4 digits</xsd:documentation>
+			<xsd:documentation xml:lang="fr">1 à 4 chiffres</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:minLength value="1"/>
+				<xsd:maxLength value="4"/>
+				<xsd:pattern value="[0-9]{1,4}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="PurchasedInputYearEndAmount">
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:AmountDollarsOnlyType">
+				<xsd:pattern value="[0-9]{1,11}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="DeferredIncomeReceivableData" type="sfd:DeferredIncomeReceivableDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Occurs 0 to 8 times</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Se produit de 0 à 8 fois</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DeferredIncomeReceivableDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:DeferredIncomeReceivableTypeCode"/>
+			<xsd:element ref="sfd:DeferredIncomeReceivableYearEndAmount"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="DeferredIncomeReceivableTypeCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">1 to 4 digits</xsd:documentation>
+			<xsd:documentation xml:lang="fr">1 à 4 chiffres</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:minLength value="1"/>
+				<xsd:maxLength value="4"/>
+				<xsd:pattern value="[0-9]{1,4}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="DeferredIncomeReceivableYearEndAmount">
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:AmountDollarsOnlyType">
+				<xsd:pattern value="[0-9]{1,11}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="AccountsPayableData" type="sfd:AccountsPayableDataType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Occurs 0 to 8 times</xsd:documentation>
+			<xsd:documentation xml:lang="fr">Se produit de 0 à 8 fois</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AccountsPayableDataType">
+		<xsd:sequence>
+			<xsd:element ref="sfd:AccountsPayableTypeCode"/>
+			<xsd:element ref="sfd:AccountsPayableYearEndAmount"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="AccountsPayableTypeCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">1 to 4 digits</xsd:documentation>
+			<xsd:documentation xml:lang="fr">1 à 4 chiffres</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:CodeType">
+				<xsd:minLength value="1"/>
+				<xsd:maxLength value="4"/>
+				<xsd:pattern value="[0-9]{1,4}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="AccountsPayableYearEndAmount">
+		<xsd:simpleType>
+			<xsd:restriction base="sdt:AmountDollarsOnlyType">
+				<xsd:pattern value="[0-9]{1,11}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+</xsd:schema>
